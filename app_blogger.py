@@ -92,7 +92,7 @@ def clean_html_response(raw_text):
     match = re.search(r'```(?:html)?\s*(.*?)\s*```', raw_text, flags=re.DOTALL | re.IGNORECASE)
     return match.group(1).strip() if match else raw_text.strip()
 
-# --- Gemini API 호출 (완벽 교정 버전) ---
+# --- Gemini API 호출 ---
 def analyze_images_and_get_metadata(gemini_client, pil_images, image_names, user_hint=""):
     prompt = f"""
     당신은 전문 여행/맛집 블로거이자 SEO/AEO 최적화 전문가입니다.
@@ -117,7 +117,6 @@ def analyze_images_and_get_metadata(gemini_client, pil_images, image_names, user
         except Exception as e:
             continue
             
-    # 비상 폴백 데이터 (AI 파싱 실패 시 힌트 기반 생성)
     fallback_title = f"{user_hint if user_hint else '국내 여행 및 맛집'} 탐방 솔직 후기"
     return {
         "title": fallback_title,
@@ -191,7 +190,6 @@ if st.button("✨ 사진 분석 및 원클릭 포스팅 시작", type="primary",
             if url:
                 final_html = re.sub(rf'src=[\'"][^\'"]*{re.escape(item["name"])}[\'"]', f'src="{url}"', final_html)
             
-        # 검색 설명 메타 태그 추가
         final_html = f"<!-- SEO Meta --><meta name=\"description\" content=\"{meta['search_description']}\">\n" + final_html
 
         st.write("📡 블로그스팟에 메타데이터 및 본문 최종 발행 중...")
@@ -200,7 +198,6 @@ if st.button("✨ 사진 분석 및 원클릭 포스팅 시작", type="primary",
         blog_id = blogs['items'][0]['id']
         blog_name = blogs['items'][0]['name']
 
-        # 블로그스팟 포스트 바디 구성
         post_body = {
             'kind': 'blogger#post',
             'title': meta['title'],
@@ -209,7 +206,6 @@ if st.button("✨ 사진 분석 및 원클릭 포스팅 시작", type="primary",
             'customMetaData': meta['search_description']
         }
         
-        # 발행 실행
         post = blogger.posts().insert(blogId=blog_id, body=post_body, isDraft=False).execute()
         post_id = post.get('id')
         post_url = post.get('url', '')
@@ -221,8 +217,11 @@ if st.button("✨ 사진 분석 및 원클릭 포스팅 시작", type="primary",
     st.markdown(f"**🏷️ 적용된 라벨:** {', '.join(meta['labels'])}")
     st.markdown(f"**🔎 검색 설명:** {meta['search_description']}")
     
-    col1, col2 = st.columns(2)
-    with col1:
-        st.link_button("👉 발행된 포스트 보러가기", post_url, use_container_width=True)
-    with col2:
-        st.link_button("✏️ 블로그스팟 수정 화면으로 가기", f"[https://www.blogger.com/blog/post/edit/](https://www.blogger.com/blog/post/edit/){blog_id}/{post_id}", use_container_width=True)
+    # HTML 마크다운 태그를 이용해 브라우저 새 창(target="_blank")으로 정확히 열리도록 수정
+    edit_url = f"[https://www.blogger.com/blog/post/edit/](https://www.blogger.com/blog/post/edit/){blog_id}/{post_id}"
+    
+    st.markdown(
+        f"""
+        <div style="display: flex; gap: 10px; margin-top: 15px;">
+            <a href="{post_url}" target="_blank" style="flex: 1; text-align: center; background-color: #FF4B4B; color: white; padding: 10px 20px; border-radius: 5px; text-decoration: none; font-weight: bold;">👉 발행된 포스트 보러가기</a>
+            <a href="{edit_url}" target="_blank" style="flex: 1; text-align: center; background-color: #f0f2f6; color: #31333F; padding:
