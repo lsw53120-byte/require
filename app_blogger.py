@@ -217,11 +217,8 @@ if st.button("✨ 사진 분석 및 원클릭 포스팅 시작", type="primary",
     st.markdown(f"**🏷️ 적용된 라벨:** {', '.join(meta['labels'])}")
     st.markdown(f"**🔎 검색 설명:** {meta['search_description']}")
     
-    # HTML 마크다운 태그를 이용해 브라우저 새 창(target="_blank")으로 정확히 열리도록 수정
-    edit_url = f"[https://www.blogger.com/blog/post/edit/](https://www.blogger.com/blog/post/edit/){blog_id}/{post_id}"
-    
-    st.markdown(
-        f"""
-        <div style="display: flex; gap: 10px; margin-top: 15px;">
-            <a href="{post_url}" target="_blank" style="flex: 1; text-align: center; background-color: #FF4B4B; color: white; padding: 10px 20px; border-radius: 5px; text-decoration: none; font-weight: bold;">👉 발행된 포스트 보러가기</a>
-            <a href="{edit_url}" target="_blank" style="flex: 1; text-align: center; background-color: #f0f2f6; color: #31333F; padding:
+    col1, col2 = st.columns(2)
+    with col1:
+        st.link_button("👉 발행된 포스트 보러가기", post_url, use_container_width=True)
+    with col2:
+        st.link_button("✏️ 블로그스팟 수정 화면으로 가기", f"[https://www.blogger.com/blog/post/edit/](https://www.blogger.com/blog/post/edit/){blog_id}/{post_id}", use_container_width=True)
