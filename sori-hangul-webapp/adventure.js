@@ -26,9 +26,26 @@
   document.querySelector('.mission b').textContent=' 놀이를 골라 보물을 모아요';
   document.querySelector('.quest p').textContent='여덟 가지 놀이를 마음껏 즐겨요!';
   document.querySelector('#start').onclick=()=>start(0);
-  function speak(value) {
+  const voiceAudio=new Audio('audio/voice.mp3?v=1');
+  voiceAudio.preload='metadata';
+  let voiceEnd=0,voiceRequest=0;
+  voiceAudio.addEventListener('timeupdate',()=>{if(voiceAudio.currentTime>=voiceEnd)voiceAudio.pause();});
+  function fallbackSpeak(value) {
     if (!('speechSynthesis' in window)) return;
-    speechSynthesis.cancel(); const u=new SpeechSynthesisUtterance(value); u.lang='ko-KR'; u.rate=.85; speechSynthesis.speak(u);
+    speechSynthesis.cancel(); const u=new SpeechSynthesisUtterance(value); u.lang='ko-KR'; u.rate=.85; u.volume=1; speechSynthesis.speak(u);
+  }
+  function speak(value) {
+    const clip=window.SORI_VOICE_MAP && window.SORI_VOICE_MAP[value];
+    const request=++voiceRequest;
+    voiceAudio.pause();
+    if ('speechSynthesis' in window) speechSynthesis.cancel();
+    if(!clip){fallbackSpeak(value);return;}
+    voiceEnd=clip[0]+clip[1];
+    try {
+      voiceAudio.currentTime=clip[0];
+      const played=voiceAudio.play();
+      if(played && played.catch)played.catch(()=>{if(request===voiceRequest)fallbackSpeak(value);});
+    } catch(error){fallbackSpeak(value);}
   }
   function update() {
     stats.innerHTML='<span class="stat">⭐ '+stars+'</span><span class="stat">🎮 자유 놀이</span>';
