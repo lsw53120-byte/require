@@ -76,14 +76,36 @@
     card.innerHTML='<span class="eyebrow">🎁 빈칸 보물 · '+(index+1)+' / '+limit()+'</span><h2>빈칸에 들어갈 글자는?</h2><div class="sound-letter" style="font-size:58px">'+current.display+'</div><p style="font:36px Jua">'+letters.slice(0,missing).join('')+' □</p><button class="listen">🔊 낱말 듣기</button><div class="choices"></div><div class="feedback" aria-live="polite">소리를 듣고 마지막 글자를 골라요!</div>';
     current.answer=answer;card.querySelector('.listen').onclick=()=>speak(current.word);shuffle([answer,...others]).forEach(x=>{const b=document.createElement('button');b.className='choice';b.textContent=x;b.onclick=()=>choose(b,x);card.querySelector('.choices').appendChild(b);});
   }
+  // Each path is one teaching stroke in a 100×100 box. Numbers mark stroke starts.
+  const writingStrokes={
+    '가':['M15 25 H48 V67'],'나':['M15 25 V67 H49'],
+    '다':['M16 25 H49','M16 25 V67 H49'],
+    '라':['M15 22 H49 V42','M49 42 H16 V64','M16 64 H50'],
+    '마':['M15 24 V67','M15 24 H49 V67','M15 67 H49'],
+    '바':['M15 23 V67','M49 23 V67','M15 45 H49','M15 67 H49'],
+    '사':['M33 25 Q31 50 14 68','M32 43 Q41 55 51 64'],
+    '아':['M33 23 C9 23 9 68 33 68 C57 68 57 23 33 23'],
+    '자':['M15 25 H50','M33 25 Q32 50 15 67','M33 42 Q42 55 51 65'],
+    '차':['M27 19 H40','M15 29 H50','M33 29 Q32 51 15 67','M33 44 Q42 56 51 65'],
+    '카':['M15 24 H49 V66','M15 45 H49'],
+    '타':['M16 24 H50','M16 24 V67 H50','M16 45 H47'],
+    '파':['M14 25 H51','M22 25 V65','M43 25 V65','M14 66 H51'],
+    '하':['M27 19 H40','M15 27 H51','M33 36 C15 36 15 68 33 68 C51 68 51 36 33 36']
+  };
+  function writingGuide(letter){
+    const strokes=[...writingStrokes[letter],'M68 14 V82','M68 48 H85'];
+    const lines=strokes.map((d,i)=>{const start=d.match(/^M(\\d+) (\\d+)/);return '<path d="'+d+'" class="guide-stroke"/><path d="'+d+'" class="guide-arrow"/><circle cx="'+start[1]+'" cy="'+start[2]+'" r="4.8" fill="#ff7950"/><text x="'+start[1]+'" y="'+(Number(start[2])+2)+'" text-anchor="middle" font-size="6" font-weight="bold" fill="white">'+(i+1)+'</text>';}).join('');
+    return '<svg viewBox="0 0 100 100" aria-hidden="true" style="position:absolute;inset:0;width:100%;height:100%;pointer-events:none"><defs><marker id="arrowhead" markerWidth="5" markerHeight="5" refX="4" refY="2.5" orient="auto"><path d="M0 0 L5 2.5 L0 5 Z" fill="#ff7950"/></marker></defs><style>.guide-stroke{fill:none;stroke:#c4dfed;stroke-width:7;stroke-linecap:round;stroke-linejoin:round}.guide-arrow{fill:none;stroke:#ff7950;stroke-width:1;stroke-dasharray:2 2;marker-end:url(#arrowhead)}</style>'+lines+'</svg>';
+  }
   function renderPractice(){
     if(mode===4){
       card.innerHTML='<span class="eyebrow">🎲 랜덤 읽기 · '+(index+1)+' / '+limit()+'</span><h2>소리 내어 읽어볼까요?</h2><div class="sound-letter">'+current.display+'</div><p>먼저 읽어보고 소리를 확인해요!</p><button class="listen">🔊 소리 듣기</button><p><button class="again next">다음 글자 →</button></p><div class="feedback" aria-live="polite"></div>';
       card.querySelector('.listen').onclick=()=>speak(current.sound);card.querySelector('.next').onclick=nextPractice;return;
     }
     card.innerHTML='<span class="eyebrow">✍️ 따라 쓰기 · '+(index+1)+' / '+limit()+'</span><h2>손가락으로 따라 써요!</h2><p>연한 글자를 따라 그려보세요</p><div style="position:relative;width:min(100%,260px);aspect-ratio:1;margin:12px auto;background:#f1f9ff;border:3px dashed #a5d4ef;border-radius:18px;overflow:hidden"><span style="position:absolute;inset:0;display:grid;place-items:center;font:bold 190px sans-serif;color:#d3e7f1;pointer-events:none">'+current.display+'</span><canvas aria-label="글자 따라 쓰기" width="520" height="520" style="position:absolute;inset:0;width:100%;height:100%;touch-action:none"></canvas></div><button class="listen">🔊 소리 듣기</button> <button class="listen clear">지우기</button> <button class="again next">다 썼어요 →</button><p class="feedback">쓴 모양은 직접 확인해 주세요.</p>';
-    const directions={'가':'ㄱ은 위에서 오른쪽으로, 꺾어서 아래로. ㅏ는 세로를 쓰고 오른쪽에 짧게 그어요.','나':'ㄴ은 위에서 아래로, 꺾어서 오른쪽으로. ㅏ는 세로를 쓰고 오른쪽에 짧게 그어요.','다':'ㄷ은 위 가로, 왼쪽 세로, 아래 가로 순서로 써요. ㅏ는 세로를 쓰고 오른쪽에 짧게 그어요.','라':'ㄹ은 위 가로, 아래로 꺾은 뒤 가로를 긋고, 다시 아래와 오른쪽으로 써요. ㅏ는 세로와 짧은 가로를 써요.','마':'ㅁ은 왼쪽 세로, 위 가로와 오른쪽 세로, 아래 가로를 써요. ㅏ는 세로와 짧은 가로를 써요.','바':'ㅂ은 왼쪽 세로, 오른쪽 세로, 가운데 가로, 아래 가로를 써요. ㅏ는 세로와 짧은 가로를 써요.','사':'ㅅ은 왼쪽 획을 위에서 아래로, 오른쪽 획을 이어 써요. ㅏ는 세로와 짧은 가로를 써요.','아':'ㅇ은 위에서 시작해 둥글게 돌아요. ㅏ는 세로를 쓰고 오른쪽에 짧게 그어요.'};
-    const guide=directions[current.display];if(guide){card.querySelector('.feedback').textContent='✏️ '+guide+' 쓴 모양은 직접 확인해 주세요.';}
+    const guideElement=card.querySelector('canvas').previousElementSibling;
+    guideElement.outerHTML=writingGuide(current.display);
+    card.querySelector('.feedback').textContent='숫자 순서대로 시작점에서 화살표 방향으로 따라 써요. 모양은 직접 확인해 주세요.';
     const canvas=card.querySelector('canvas'),ctx=canvas.getContext('2d');let drawing=false,hasInk=false;
     function point(e){const r=canvas.getBoundingClientRect();return [(e.clientX-r.left)*canvas.width/r.width,(e.clientY-r.top)*canvas.height/r.height];}
     canvas.onpointerdown=e=>{e.preventDefault();drawing=true;canvas.setPointerCapture(e.pointerId);const [x,y]=point(e);ctx.beginPath();ctx.moveTo(x,y);ctx.lineTo(x+.1,y+.1);ctx.lineWidth=16;ctx.lineCap='round';ctx.lineJoin='round';ctx.strokeStyle='#187bd0';ctx.stroke();hasInk=true;};
