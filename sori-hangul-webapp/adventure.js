@@ -94,7 +94,7 @@
   };
   function writingGuide(letter){
     const strokes=[...writingStrokes[letter],'M68 14 V82','M68 48 H85'];
-    const lines=strokes.map((d,i)=>{const start=d.match(/^M(\\d+) (\\d+)/);return '<path d="'+d+'" class="guide-stroke"/><path d="'+d+'" class="guide-arrow"/><circle cx="'+start[1]+'" cy="'+start[2]+'" r="4.8" fill="#ff7950"/><text x="'+start[1]+'" y="'+(Number(start[2])+2)+'" text-anchor="middle" font-size="6" font-weight="bold" fill="white">'+(i+1)+'</text>';}).join('');
+    const lines=strokes.map((d,i)=>{const start=d.match(/^M([0-9]+) ([0-9]+)/);return '<path d="'+d+'" class="guide-stroke"/><path d="'+d+'" class="guide-arrow"/><circle cx="'+start[1]+'" cy="'+start[2]+'" r="4.8" fill="#ff7950"/><text x="'+start[1]+'" y="'+(Number(start[2])+2)+'" text-anchor="middle" font-size="6" font-weight="bold" fill="white">'+(i+1)+'</text>';}).join('');
     return '<svg viewBox="0 0 100 100" aria-hidden="true" style="position:absolute;inset:0;width:100%;height:100%;pointer-events:none"><defs><marker id="arrowhead" markerWidth="5" markerHeight="5" refX="4" refY="2.5" orient="auto"><path d="M0 0 L5 2.5 L0 5 Z" fill="#ff7950"/></marker></defs><style>.guide-stroke{fill:none;stroke:#c4dfed;stroke-width:7;stroke-linecap:round;stroke-linejoin:round}.guide-arrow{fill:none;stroke:#ff7950;stroke-width:1;stroke-dasharray:2 2;marker-end:url(#arrowhead)}</style>'+lines+'</svg>';
   }
   function renderPractice(){
