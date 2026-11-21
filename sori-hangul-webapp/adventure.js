@@ -1,12 +1,13 @@
 (() => {
   const consonants = ['ㄱ','ㄴ','ㄷ','ㄹ','ㅁ','ㅂ','ㅅ','ㅇ','ㅈ','ㅊ','ㅋ','ㅌ','ㅍ','ㅎ'];
   const syllables = ['가','나','다','라','마','바','사','아','자','차','카','타','파','하'];
+  const allSyllables = Array.from({length:14},(_,i)=>Array.from({length:6},(_,v)=>String.fromCharCode(0xac00+(i*21+[0,4,8,13,18,20][v])*28))).flat();
   const words = [['🍎','사과'],['🐰','토끼'],['🐟','물고기'],['🍌','바나나'],['🌳','나무'],['🐶','강아지'],['🚗','자동차'],['☁️','구름'],['🌙','달'],['🐱','고양이'],['🍇','포도'],['🦋','나비'],['🍓','딸기'],['🐘','코끼리'],['🌻','해바라기'],['🐢','거북이'],['🍉','수박'],['🐝','벌'],['🌈','무지개'],['🐣','병아리']];
   const vowels = ['ㅏ','ㅓ','ㅗ','ㅜ','ㅡ','ㅣ'];
   const base = [0,2,3,5,6,7,9,11,12,14,15,16,17,18];
   const vowelIndex = [0,4,8,13,18,20];
   const compose = (c,v) => String.fromCharCode(0xac00+(base[c]*21+vowelIndex[v])*28);
-  const shuffle = a => [...a].sort(() => Math.random()-.5);
+  const shuffle = a => {const x=[...a];for(let i=x.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[x[i],x[j]]=[x[j],x[i]];}return x;};
   let mode = 0, index = 0, locked = false, current = null, order = [], nextTimer = null;
   let stars = Number(localStorage.getItem('soriStars') || 0);
   const zone = document.querySelector('#playZone'), card = zone.querySelector('.play-card');
@@ -42,21 +43,21 @@
     meter.style.width=Math.min(100,index/limit()*100)+'%';
     buttons.forEach((b,i)=>b.classList.toggle('current',i===mode));
   }
-  function limit(){ return [14,84,20,30,30,30,20,20][mode]; }
-  function start(which){clearTimeout(nextTimer);mode=which;index=0;locked=false;order=shuffle(Array.from({length:[3,4,5].includes(mode)?84:limit()},(_,i)=>i));render();zone.scrollIntoView({behavior:'smooth',block:'start'});}
+  function limit(){ return [14,84,20,allSyllables.length,allSyllables.length,allSyllables.length,words.length,words.length][mode]; }
+  function start(which){clearTimeout(nextTimer);mode=which;index=0;locked=false;const pool=mode===0?14:mode===1||mode===3||mode===4||mode===5?allSyllables.length:mode===2||mode===6||mode===7?words.length:limit();order=shuffle(Array.from({length:pool},(_,i)=>i));render();zone.scrollIntoView({behavior:'smooth',block:'start'});}
   function makeQuestion(){
     const n=order[index] ?? index;
     if(mode===0){return {title:'첫소리를 찾아요!', display:syllables[n], sound:syllables[n], answer:consonants[n], options:shuffle([consonants[n],...shuffle(consonants.filter(x=>x!==consonants[n])).slice(0,2)])};}
     if(mode===1){const c=Math.floor(n/6),v=n%6, target=compose(c,v); return {title:'글자 조각을 골라요!', display:consonants[c]+' + ?', sound:target, hint:'“'+target+'”를 만들려면 어떤 모음이 필요할까요?', answer:vowels[v],options:shuffle([vowels[v],...shuffle(vowels.filter(x=>x!==vowels[v])).slice(0,2)])};}
     if(mode===2){const [emoji,word]=words[n]; return {title:'그림에 맞는 낱말은?',display:emoji,sound:word,answer:word,options:shuffle([word,...shuffle(words.map(x=>x[1]).filter(x=>x!==word)).slice(0,2)])};}
-    if(mode===5){const target=compose(Math.floor(n/6),n%6);const others=shuffle(Array.from({length:84},(_,i)=>compose(Math.floor(i/6),i%6)).filter(x=>x!==target));return {title:'소리를 듣고 글자를 찾아요!',display:'👂',sound:target,hint:'소리 듣기를 눌러봐요',answer:target,options:shuffle([target,...others.slice(0,2)])};}
+    if(mode===5){const target=allSyllables[n];const others=shuffle(allSyllables.filter(x=>x!==target));return {title:'소리를 듣고 글자를 찾아요!',display:'👂',sound:target,hint:'소리 듣기를 눌러봐요',answer:target,options:shuffle([target,...others.slice(0,2)])};}
     if(mode===6||mode===7){const [emoji,word]=words[n];return {display:emoji,sound:word,word};}
-    const target=mode===3 ? syllables[n%syllables.length] : compose(Math.floor(n/6),n%6);
+    const target=mode===3 ? allSyllables[n%allSyllables.length] : allSyllables[n%allSyllables.length];
     return {title:mode===3?'손가락으로 따라 써요!':'어떤 글자일까요?',display:target,sound:target};
   }
   function render(){
     update();
-    if(index>=limit()){card.innerHTML='<div class="reward"><div class="stars">⭐️⭐️⭐️</div><h2>모험 완료!</h2><p>'+limit()+'개의 문제를 풀었어요!</p><button class="again">다시 놀기</button></div>';card.querySelector('button').onclick=()=>start(mode);return;}
+    if(index>=limit()){card.innerHTML='<div class="reward"><div class="stars">⭐️⭐️⭐️</div><h2>미션 완료!</h2><p>'+limit()+'개를 모두 해냈어요! 다음 놀이도 열렸어요.</p><button class="again next-stage">다음 단계 →</button> <button class="again replay">다시 놀기</button></div>';card.querySelector('.next-stage').onclick=()=>start((mode+1)%labels.length);card.querySelector('.replay').onclick=()=>start(mode);return;}
     current=makeQuestion(); locked=false;
     if(mode===3||mode===4){renderPractice();return;}
     if(mode===6){renderTrain();return;}
@@ -68,7 +69,7 @@
   function choose(button,answer){
     if(locked)return;
     if(answer!==current.answer){button.classList.add('bad');card.querySelector('.feedback').textContent='괜찮아요! 다시 골라봐요 🌱';return;}
-    locked=true;button.classList.add('good');stars++;localStorage.setItem('soriStars',String(stars));card.querySelector('.feedback').textContent='딩동댕! 별 하나를 얻었어요 ⭐';speak(current.sound);index++;update();nextTimer=setTimeout(render,1000);
+    locked=true;button.classList.add('good');stars++;localStorage.setItem('soriStars',String(stars));card.querySelector('.feedback').textContent='딩동댕! 별 하나를 얻었어요 ⭐';speak(current.sound);index++;update();nextTimer=setTimeout(render,700);
   }
   function renderTrain(){
     const letters=Array.from(current.word);let placed=[];current.answer=current.word;
