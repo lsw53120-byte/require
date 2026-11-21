@@ -30,11 +30,15 @@
   function speak(value) {
     if (!('speechSynthesis' in window)) return;
     speechSynthesis.cancel();
-    const u=new SpeechSynthesisUtterance(value);
-    u.lang='ko-KR'; u.rate=.85; u.volume=1;
-    const voices=speechSynthesis.getVoices();
-    const korean=voices.find(v=>v.lang.toLowerCase()==='ko-kr') || voices.find(v=>v.lang.toLowerCase().startsWith('ko'));
-    if(korean)u.voice=korean;
+    const text = String(value).trim();
+    const singleSyllable = /^[가-힣]$/.test(text);
+    const u = new SpeechSynthesisUtterance(singleSyllable ? '글자, ' + text + '.' : text);
+    u.lang = 'ko-KR'; u.rate = .78; u.pitch = 1; u.volume = 1;
+    const voices = speechSynthesis.getVoices();
+    const korean = voices.find(v => v.lang.toLowerCase() === 'ko-kr' && /google/i.test(v.name))
+      || voices.find(v => v.lang.toLowerCase() === 'ko-kr')
+      || voices.find(v => v.lang.toLowerCase().startsWith('ko'));
+    if (korean) u.voice = korean;
     speechSynthesis.speak(u);
   }
   function update() {
