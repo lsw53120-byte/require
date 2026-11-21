@@ -1,12 +1,12 @@
 (() => {
   const consonants = ['ㄱ','ㄴ','ㄷ','ㄹ','ㅁ','ㅂ','ㅅ','ㅇ','ㅈ','ㅊ','ㅋ','ㅌ','ㅍ','ㅎ'];
   const syllables = ['가','나','다','라','마','바','사','아','자','차','카','타','파','하'];
-  const allSyllables = Array.from({length:14},(_,c)=>Array.from({length:6},(_,v)=>compose(c,v))).flat();
   const words = [['🍎','사과'],['🐰','토끼'],['🐟','물고기'],['🍌','바나나'],['🌳','나무'],['🐶','강아지'],['🚗','자동차'],['☁️','구름'],['🌙','달'],['🐱','고양이'],['🍇','포도'],['🦋','나비'],['🍓','딸기'],['🐘','코끼리'],['🌻','해바라기'],['🐢','거북이'],['🍉','수박'],['🐝','벌'],['🌈','무지개'],['🐣','병아리']];
   const vowels = ['ㅏ','ㅓ','ㅗ','ㅜ','ㅡ','ㅣ'];
   const base = [0,2,3,5,6,7,9,11,12,14,15,16,17,18];
   const vowelIndex = [0,4,8,13,18,20];
   const compose = (c,v) => String.fromCharCode(0xac00+(base[c]*21+vowelIndex[v])*28);
+  const allSyllables = Array.from({length:14},(_,c)=>Array.from({length:6},(_,v)=>compose(c,v))).flat();
   const shuffle = a => {const x=[...a];for(let i=x.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[x[i],x[j]]=[x[j],x[i]];}return x;};
   let mode = 0, index = 0, locked = false, current = null, order = [], nextTimer = null;
   let stars = Number(localStorage.getItem('soriStars') || 0);
