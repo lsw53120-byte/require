@@ -27,19 +27,31 @@
   document.querySelector('.mission b').textContent=' 놀이를 골라 보물을 모아요';
   document.querySelector('.quest p').textContent='여덟 가지 놀이를 마음껏 즐겨요!';
   document.querySelector('#start').onclick=()=>start(0);
+  let speechToken = 0;
+  let speechTimer = 0;
+  function stopSpeech() {
+    speechToken++;
+    clearTimeout(speechTimer);
+    if ('speechSynthesis' in window) speechSynthesis.cancel();
+  }
   function speak(value) {
     if (!('speechSynthesis' in window)) return;
+    const token = ++speechToken;
+    clearTimeout(speechTimer);
     speechSynthesis.cancel();
     const text = String(value).trim();
-    const singleSyllable = /^[가-힣]$/.test(text);
-    const u = new SpeechSynthesisUtterance(singleSyllable ? '글자, ' + text + '.' : text);
+    const u = new SpeechSynthesisUtterance(/^[가-힣]$/.test(text) ? '글자, ' + text + '.' : text);
     u.lang = 'ko-KR'; u.rate = .78; u.pitch = 1; u.volume = 1;
     const voices = speechSynthesis.getVoices();
     const korean = voices.find(v => v.lang.toLowerCase() === 'ko-kr' && /google/i.test(v.name))
       || voices.find(v => v.lang.toLowerCase() === 'ko-kr')
       || voices.find(v => v.lang.toLowerCase().startsWith('ko'));
     if (korean) u.voice = korean;
-    speechSynthesis.speak(u);
+    speechTimer = setTimeout(() => {
+      if (token !== speechToken) return;
+      speechSynthesis.cancel();
+      speechSynthesis.speak(u);
+    }, 180);
   }
   function update() {
     stats.innerHTML='<span class="stat">⭐ '+stars+'</span><span class="stat">🎮 자유 놀이</span>';
@@ -48,7 +60,7 @@
     buttons.forEach((b,i)=>b.classList.toggle('current',i===mode));
   }
   function limit(){ return [14,84,20,allSyllables.length,allSyllables.length,allSyllables.length,words.length,words.length][mode]; }
-  function start(which){clearTimeout(nextTimer);mode=which;index=0;locked=false;const pool=mode===0?14:mode===1||mode===3||mode===4||mode===5?allSyllables.length:mode===2||mode===6||mode===7?words.length:limit();order=shuffle(Array.from({length:pool},(_,i)=>i));render();zone.scrollIntoView({behavior:'smooth',block:'start'});}
+  function start(which){clearTimeout(nextTimer);stopSpeech();mode=which;index=0;locked=false;const pool=mode===0?14:mode===1||mode===3||mode===4||mode===5?allSyllables.length:mode===2||mode===6||mode===7?words.length:limit();order=shuffle(Array.from({length:pool},(_,i)=>i));render();zone.scrollIntoView({behavior:'smooth',block:'start'});}
   function makeQuestion(){
     const n=order[index] ?? index;
     if(mode===0){return {title:'첫소리를 찾아요!', display:syllables[n], sound:syllables[n], answer:consonants[n], options:shuffle([consonants[n],...shuffle(consonants.filter(x=>x!==consonants[n])).slice(0,2)])};}
