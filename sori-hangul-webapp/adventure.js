@@ -85,7 +85,7 @@
   function choose(button,answer){
     if(locked)return;
     if(answer!==current.answer){button.classList.add('bad');card.querySelector('.feedback').textContent='괜찮아요! 다시 골라봐요 🌱';return;}
-    locked=true;button.classList.add('good');stars++;localStorage.setItem('soriStars',String(stars));card.querySelector('.feedback').textContent='딩동댕! 별 하나를 얻었어요 ⭐';speak(current.sound);index++;update();nextTimer=setTimeout(render,700);
+    locked=true;button.classList.add('good');stars++;localStorage.setItem('soriStars',String(stars));card.querySelector('.feedback').textContent='딩동댕! 별 하나를 얻었어요 ⭐';index++;update();nextTimer=setTimeout(render,250);
   }
   function renderTrain(){
     const letters=Array.from(current.word);let placed=[];current.answer=current.word;
