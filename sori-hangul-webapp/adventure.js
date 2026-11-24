@@ -32,53 +32,61 @@
   document.head.appendChild(voiceMapScript);
   const recordedVoice = new Audio('audio/voice.mp3');
   recordedVoice.preload = 'metadata';
-  let audioTimer = 0;
-  let speechToken = 0;
-  let speechTimer = 0;
+  let speechToken = 0, clipEnd = 0, clipTimer = 0;
   function stopSpeech() {
     speechToken++;
-    clearTimeout(speechTimer);
-    clearTimeout(audioTimer);
+    clearInterval(clipTimer);
     recordedVoice.pause();
     if ('speechSynthesis' in window) speechSynthesis.cancel();
   }
+  function speakRecording(text, token) {
+    if (token !== speechToken) return;
+    const clip = window.SORI_VOICE_MAP && window.SORI_VOICE_MAP[text];
+    if (!clip) {
+      const feedback = card.querySelector('.feedback');
+      if (feedback) feedback.textContent = '음성을 준비하지 못했어요. 다시 눌러 주세요.';
+      return;
+    }
+    clipEnd = clip[0] + clip[1];
+    try {
+      recordedVoice.currentTime = clip[0];
+      const play = recordedVoice.play();
+      clipTimer = setInterval(() => {
+        if (token !== speechToken || recordedVoice.currentTime >= clipEnd) {
+          recordedVoice.pause(); clearInterval(clipTimer);
+        }
+      }, 50);
+      if (play && play.catch) play.catch(() => {
+        clearInterval(clipTimer);
+        if (token === speechToken) {
+          const feedback = card.querySelector('.feedback');
+          if (feedback) feedback.textContent = '음성을 재생하지 못했어요. 소리 듣기를 다시 눌러 주세요.';
+        }
+      });
+    } catch (_) {
+      clearInterval(clipTimer);
+      const feedback = card.querySelector('.feedback');
+      if (feedback) feedback.textContent = '음성을 재생하지 못했어요. 다시 눌러 주세요.';
+    }
+  }
   function speak(value) {
     stopSpeech();
-    const clip = window.SORI_VOICE_MAP && window.SORI_VOICE_MAP[String(value).trim()];
-    if (clip) {
-      const token = speechToken;
-      recordedVoice.currentTime = clip[0];
-      const playing = recordedVoice.play();
-      if (playing && playing.then) playing.then(() => {
-        if (token !== speechToken) return;
-        audioTimer = setTimeout(() => recordedVoice.pause(), clip[1] * 1000);
-      }).catch(() => { if (token === speechToken) speakFallback(value); });
-      return;
-    }
-    speakFallback(value);
-  }
-  function speakFallback(value) {
-    if (!('speechSynthesis' in window)) {
-      const feedback = card.querySelector('.feedback');
-      if (feedback) feedback.textContent = '이 기기에서는 소리를 재생할 수 없어요.';
-      return;
-    }
-    const token = ++speechToken;
-    clearTimeout(speechTimer);
-    speechSynthesis.cancel();
+    const token = speechToken;
     const text = String(value).trim();
-    const u = new SpeechSynthesisUtterance(/^[가-힣]$/.test(text) ? '글자, ' + text + '.' : text);
-    u.lang = 'ko-KR'; u.rate = .78; u.pitch = 1; u.volume = 1;
-    const voices = speechSynthesis.getVoices();
-    const korean = voices.find(v => v.lang.toLowerCase() === 'ko-kr' && /google/i.test(v.name))
-      || voices.find(v => v.lang.toLowerCase() === 'ko-kr')
-      || voices.find(v => v.lang.toLowerCase().startsWith('ko'));
-    if (korean) u.voice = korean;
-    speechTimer = setTimeout(() => {
-      if (token !== speechToken) return;
-      speechSynthesis.cancel();
-      speechSynthesis.speak(u);
-    }, 180);
+    if ('speechSynthesis' in window && 'SpeechSynthesisUtterance' in window) {
+      const synth = window.speechSynthesis;
+      const voices = synth.getVoices();
+      const korean = voices.find(v => /^ko(-|_)?kr$/i.test(v.lang) && /google/i.test(v.name))
+        || voices.find(v => /^ko(-|_)?kr$/i.test(v.lang))
+        || voices.find(v => /^ko(-|_)/i.test(v.lang));
+      if (korean) {
+        const u = new SpeechSynthesisUtterance(text);
+        u.lang = 'ko-KR'; u.voice = korean; u.rate = .85; u.volume = 1;
+        u.onerror = () => { if (token === speechToken) speakRecording(text, token); };
+        try { synth.speak(u); return; } catch (_) { /* Use the recording below. */ }
+      }
+    }
+    speakRecording(text, token);
   }
   function update() {
     stats.innerHTML='<span class="stat">⭐ '+stars+'</span><span class="stat">🎮 자유 놀이</span>';
