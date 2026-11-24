@@ -27,15 +27,42 @@
   document.querySelector('.mission b').textContent=' 놀이를 골라 보물을 모아요';
   document.querySelector('.quest p').textContent='여덟 가지 놀이를 마음껏 즐겨요!';
   document.querySelector('#start').onclick=()=>start(0);
+  const voiceMapScript = document.createElement('script');
+  voiceMapScript.src = 'audio/voice-map.js';
+  document.head.appendChild(voiceMapScript);
+  const recordedVoice = new Audio('audio/voice.mp3');
+  recordedVoice.preload = 'metadata';
+  let audioTimer = 0;
   let speechToken = 0;
   let speechTimer = 0;
   function stopSpeech() {
     speechToken++;
     clearTimeout(speechTimer);
+    clearTimeout(audioTimer);
+    recordedVoice.pause();
     if ('speechSynthesis' in window) speechSynthesis.cancel();
   }
   function speak(value) {
-    if (!('speechSynthesis' in window)) return;
+    stopSpeech();
+    const clip = window.SORI_VOICE_MAP && window.SORI_VOICE_MAP[String(value).trim()];
+    if (clip) {
+      const token = speechToken;
+      recordedVoice.currentTime = clip[0];
+      const playing = recordedVoice.play();
+      if (playing && playing.then) playing.then(() => {
+        if (token !== speechToken) return;
+        audioTimer = setTimeout(() => recordedVoice.pause(), clip[1] * 1000);
+      }).catch(() => { if (token === speechToken) speakFallback(value); });
+      return;
+    }
+    speakFallback(value);
+  }
+  function speakFallback(value) {
+    if (!('speechSynthesis' in window)) {
+      const feedback = card.querySelector('.feedback');
+      if (feedback) feedback.textContent = '이 기기에서는 소리를 재생할 수 없어요.';
+      return;
+    }
     const token = ++speechToken;
     clearTimeout(speechTimer);
     speechSynthesis.cancel();
@@ -127,8 +154,12 @@
     }
     card.innerHTML='<span class="eyebrow">✍️ 따라 쓰기 · '+(index+1)+' / '+limit()+'</span><h2>손가락으로 따라 써요!</h2><p>연한 글자를 따라 그려보세요</p><div style="position:relative;width:min(100%,260px);aspect-ratio:1;margin:12px auto;background:#f1f9ff;border:3px dashed #a5d4ef;border-radius:18px;overflow:hidden"><span style="position:absolute;inset:0;display:grid;place-items:center;font:bold 190px sans-serif;color:#d3e7f1;pointer-events:none">'+current.display+'</span><canvas aria-label="글자 따라 쓰기" width="520" height="520" style="position:absolute;inset:0;width:100%;height:100%;touch-action:none"></canvas></div><button class="listen">🔊 소리 듣기</button> <button class="listen clear">지우기</button> <button class="again next">다 썼어요 →</button><p class="feedback">쓴 모양은 직접 확인해 주세요.</p>';
     const guideElement=card.querySelector('canvas').previousElementSibling;
-    guideElement.outerHTML=writingGuide(current.display);
-    card.querySelector('.feedback').textContent='숫자 순서대로 시작점에서 화살표 방향으로 따라 써요. 모양은 직접 확인해 주세요.';
+    if (writingStrokes[current.display]) {
+      guideElement.outerHTML=writingGuide(current.display);
+      card.querySelector('.feedback').textContent='숫자 순서대로 시작점에서 화살표 방향으로 따라 써요. 모양은 직접 확인해 주세요.';
+    } else {
+      card.querySelector('.feedback').textContent='연한 글자를 따라 써요. 쓴 모양은 직접 확인해 주세요.';
+    }
     const canvas=card.querySelector('canvas'),ctx=canvas.getContext('2d');let drawing=false,hasInk=false;
     function point(e){const r=canvas.getBoundingClientRect();return [(e.clientX-r.left)*canvas.width/r.width,(e.clientY-r.top)*canvas.height/r.height];}
     canvas.onpointerdown=e=>{e.preventDefault();drawing=true;canvas.setPointerCapture(e.pointerId);const [x,y]=point(e);ctx.beginPath();ctx.moveTo(x,y);ctx.lineTo(x+.1,y+.1);ctx.lineWidth=16;ctx.lineCap='round';ctx.lineJoin='round';ctx.strokeStyle='#187bd0';ctx.stroke();hasInk=true;};
