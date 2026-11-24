@@ -27,6 +27,8 @@ jobs:
         uses: actions/upload-pages-artifact@v3
         with:
           path: ./sori-hangul-webapp
+      - name: Wait for artifact availability
+        run: sleep 30
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
