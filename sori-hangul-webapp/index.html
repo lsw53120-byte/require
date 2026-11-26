@@ -30,5 +30,29 @@
  canvas,button{touch-action:manipulation}
  footer{padding-bottom:calc(20px + env(safe-area-inset-bottom))}
 }
-</style></head><body><main class="game"><header class="top"><div class="avatar"><span class="avatar-face">🦊</span><span>지우의 모험</span></div><div class="stats"><span class="stat">❤️ 3</span><span class="stat">⭐ 128</span><span class="stat">Lv. 2</span></div></header><section class="stage"><div class="cloud"></div><div class="cloud two"></div><div class="stage-content"><span class="quest-label">오늘의 모험 01</span><div class="quest"><h1>소리섬에 도착했어요!</h1><p>첫소리 보물을 찾아 미션을 완료해요.</p></div></div><div class="character">🦊</div><div class="sign">소리섬</div></section><section class="mission"><div class="mission-top"><div><small>오늘의 미션</small><b> 글자 보물 3개 찾기</b></div><button class="mission-go" id="start">시작!</button></div><div class="meter"><i id="meter"></i></div></section><section class="section"><div class="section-head"><div><span>ADVENTURE MAP</span><h2>한글 모험 지도</h2></div><span>1 / 3 스테이지</span></div><div class="path"><button class="level done" id="level1"><span class="level-icon l1">가</span><b>소리 동굴</b><small>완료 ✓</small><span class="check">●</span></button><button class="level current"><span class="level-icon l2">나</span><b>단어 숲</b><small>지금 도전!</small></button><button class="level locked"><span class="level-icon l3">다</span><b>문장 마을</b><small>🔒 잠김</small></button></div></section><section class="play-zone" id="playZone"><div class="play-card"><span class="eyebrow">소리 보물찾기 · 1단계</span><h2>“가”의 첫소리를 골라요!</h2><div class="sound-letter">가</div><button class="listen" id="listen">🔊 소리 듣기</button><div class="choices"><button class="choice" data-a="ㄱ">ㄱ</button><button class="choice" data-a="ㄴ">ㄴ</button><button class="choice" data-a="ㅁ">ㅁ</button></div><div class="feedback" id="feedback">정답을 고르면 보물상자가 열려요!</div></div></section><footer>소리로 배우고, 모험으로 기억해요 ✨</footer></main><script src="adventure.js?v=20261126-mixed-adventure"></script></body></html>
+
+/* RPG travel map and arrival animations */
+.travel-route{position:absolute;left:7%;right:21%;bottom:47px;height:7px;border-top:5px dotted #fff9;z-index:1}
+.travel-route i{position:absolute;top:-11px;width:16px;height:16px;border:3px solid #fff;background:#ffbe48;border-radius:50%;box-shadow:0 2px 0 #bc8c3d}
+.travel-route i:nth-child(1){left:0}.travel-route i:nth-child(2){left:50%}.travel-route i:nth-child(3){right:0}
+.character{right:auto;left:4%;z-index:2}
+.sign{z-index:3}
+.travel-status{position:absolute;left:14px;bottom:7px;z-index:3;padding:5px 10px;border-radius:99px;background:#fff9;color:#286546;font:13px Jua;box-shadow:0 2px 0 #276c4b33}
+.stage.traveling .character{animation:journey-hop 1.85s cubic-bezier(.2,.75,.25,1) forwards}
+.stage.arrived .character{transform:translateX(min(58vw,280px))}
+@keyframes journey-hop{
+  0%{transform:translateX(0) translateY(0) rotate(0)}
+  16%{transform:translateX(38px) translateY(-20px) rotate(-8deg)}
+  34%{transform:translateX(92px) translateY(0) rotate(7deg)}
+  53%{transform:translateX(150px) translateY(-23px) rotate(-7deg)}
+  74%{transform:translateX(210px) translateY(0) rotate(8deg)}
+  100%{transform:translateX(min(58vw,280px)) translateY(0) rotate(0)}
+}
+@media(max-width:699px){
+ .travel-status{font-size:12px}
+ .travel-route{right:19%;bottom:42px}
+ .stage.traveling .character{animation-duration:1.85s}
+}
+@media(prefers-reduced-motion:reduce){.stage.traveling .character{animation-duration:.01ms;animation-iteration-count:1}}
+</style></head><body><main class="game"><header class="top"><div class="avatar"><span class="avatar-face">🦊</span><span>지우의 모험</span></div><div class="stats"><span class="stat">❤️ 3</span><span class="stat">⭐ 128</span><span class="stat">Lv. 2</span></div></header><section class="stage" id="worldStage"><div class="cloud"></div><div class="cloud two"></div><div class="stage-content"><span class="quest-label" id="travelTag">🧭 소리섬 여행 · 1</span><div class="quest"><h1 id="worldTitle">소리섬에서 출발해요!</h1><p id="worldNote">글자 보물을 모아 다음 섬으로 떠나요.</p></div></div><div class="travel-route" aria-hidden="true"><i></i><i></i><i></i></div><div class="character" id="traveler">🦊</div><div class="sign" id="destination">소리섬</div><div class="travel-status" id="travelStatus" aria-live="polite">지도를 따라 모험을 떠나요!</div></section><section class="mission"><div class="mission-top"><div><small>오늘의 미션</small><b> 글자 보물 3개 찾기</b></div><button class="mission-go" id="start">시작!</button></div><div class="meter"><i id="meter"></i></div></section><section class="section"><div class="section-head"><div><span>ADVENTURE MAP</span><h2>한글 모험 지도</h2></div><span>1 / 3 스테이지</span></div><div class="path"><button class="level done" id="level1"><span class="level-icon l1">가</span><b>소리 동굴</b><small>완료 ✓</small><span class="check">●</span></button><button class="level current"><span class="level-icon l2">나</span><b>단어 숲</b><small>지금 도전!</small></button><button class="level locked"><span class="level-icon l3">다</span><b>문장 마을</b><small>🔒 잠김</small></button></div></section><section class="play-zone" id="playZone"><div class="play-card"><span class="eyebrow">소리 보물찾기 · 1단계</span><h2>“가”의 첫소리를 골라요!</h2><div class="sound-letter">가</div><button class="listen" id="listen">🔊 소리 듣기</button><div class="choices"><button class="choice" data-a="ㄱ">ㄱ</button><button class="choice" data-a="ㄴ">ㄴ</button><button class="choice" data-a="ㅁ">ㅁ</button></div><div class="feedback" id="feedback">정답을 고르면 보물상자가 열려요!</div></div></section><footer>소리로 배우고, 모험으로 기억해요 ✨</footer></main><script src="adventure.js?v=20261126-mixed-adventure"></script></body></html>
 
