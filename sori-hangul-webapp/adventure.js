@@ -169,12 +169,7 @@
     stopSpeech();
     const token = speechToken;
     const text = String(value).trim();
-    const hasRecordedClip = !!(window.SORI_VOICE_MAP && window.SORI_VOICE_MAP[text]);
-    if (hasRecordedClip) {
-      prepareLouderRecording();
-      speakRecording(text, token);
-      return;
-    }
+
     if ('speechSynthesis' in window && 'SpeechSynthesisUtterance' in window) {
       refreshKoreanVoices();
       const synth = window.speechSynthesis;
