@@ -134,7 +134,14 @@
         const u = new SpeechSynthesisUtterance(text);
         u.lang = 'ko-KR'; u.voice = korean; u.rate = .9; u.pitch = 1; u.volume = 1;
         u.onerror = () => { if (token === speechToken) speakRecording(text, token); };
-        try { synth.speak(u); return; } catch (_) { /* Use the recorded Korean voice below. */ }
+        try { synth.speak(u); return; } catch (_) { /* Try the recorded voice below. */ }
+      }
+      const hasRecordedWord = !!(window.SORI_VOICE_MAP && window.SORI_VOICE_MAP[text]);
+      if (!hasRecordedWord) {
+        const u = new SpeechSynthesisUtterance(text);
+        u.lang = 'ko-KR'; u.rate = .9; u.pitch = 1; u.volume = 1;
+        u.onerror = () => { if (token === speechToken) speakRecording(text, token); };
+        try { synth.speak(u); return; } catch (_) { /* Show the audio fallback message below. */ }
       }
     }
     speakRecording(text, token);
