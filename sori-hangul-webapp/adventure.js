@@ -26,14 +26,14 @@
   const meter = document.querySelector('#meter');
   const labels = [['🔊','소리 찾기'],['🧩','글자 만들기'],['🎨','그림 낱말'],['✍️','따라 쓰기'],['🎲','랜덤 읽기'],['👂','소리 탐정'],['🚂','낱말 기차'],['🎁','빈칸 보물'],['🌈','오늘의 모험']];
   const journeyStops = [
-    {name:'소리섬',icon:'🏝️',line:'바닷길을 건너 첫 글자 보물을 찾아요!'},
-    {name:'모음 호수',icon:'🛶',line:'반짝이는 모음 조각이 기다려요!'},
-    {name:'글자 숲',icon:'🌳',line:'숲속 친구들과 글자를 만들어요!'},
-    {name:'낱말 사막',icon:'🐪',line:'모래 속 낱말 보물을 찾아요!'},
-    {name:'별빛 산',icon:'🌟',line:'별을 따라 읽기 모험을 이어가요!'},
-    {name:'구름 마을',icon:'☁️',line:'구름 다리를 건너 다음 글자를 만나요!'},
-    {name:'무지개 항구',icon:'🌈',line:'배를 타고 새로운 소리를 찾아요!'},
-    {name:'한글 왕국',icon:'🏰',line:'모은 글자 보물로 왕국 축제를 열어요!'}
+    {country:'대한민국',name:'서울',icon:'🇰🇷',gameMode:0,line:'김밥과 한복 낱말의 첫소리를 찾아요!',words:[['🥁','북'],['🍙','김밥'],['🧦','버선'],['🏠','한옥'],['🌶️','김치'],['👘','한복'],['🪁','연'],['🥮','떡']]},
+    {country:'일본',name:'도쿄',icon:'🇯🇵',gameMode:2,line:'그림을 보고 일본의 낱말을 찾아요!',words:[['🍣','초밥'],['🌸','벚꽃'],['🗻','후지산'],['🚄','기차'],['🐱','고양이'],['🍜','라면'],['🎏','깃발'],['🥢','젓가락']]},
+    {country:'프랑스',name:'파리',icon:'🇫🇷',gameMode:3,line:'천천히 손가락으로 글자를 따라 써요!',words:[['🥐','빵'],['🧀','치즈'],['🗼','에펠탑'],['🌹','장미'],['🍇','포도'],['🎨','그림'],['🎩','모자'],['🚲','자전거']]},
+    {country:'이탈리아',name:'로마',icon:'🇮🇹',gameMode:6,line:'낱말 기차에 글자를 차례로 태워요!',words:[['🍕','피자'],['🍝','파스타'],['🍦','젤라토'],['🚤','곤돌라'],['🏛️','콜로세움'],['🍅','토마토'],['🎭','가면'],['🎶','오페라']]},
+    {country:'이집트',name:'카이로',icon:'🇪🇬',gameMode:5,line:'소리를 듣고 사막의 글자 보물을 찾아요!',words:[['🐪','낙타'],['🏜️','사막'],['🔺','피라미드'],['🛶','나일강'],['🐈','고양이'],['☀️','태양'],['🪲','풍뎅이'],['🧱','돌']]},
+    {country:'브라질',name:'리우',icon:'🇧🇷',gameMode:7,line:'낱말의 마지막 글자를 채워 축제를 열어요!',words:[['⚽','축구'],['🦜','앵무새'],['🌴','야자수'],['🥁','북'],['🌊','바다'],['🐒','원숭이'],['🌳','숲'],['🎉','축제']]},
+    {country:'캐나다',name:'밴쿠버',icon:'🇨🇦',gameMode:4,line:'새로운 글자를 소리 내어 읽어봐요!',words:[['🍁','단풍잎'],['🐻','곰'],['🛶','카누'],['❄️','눈'],['🦫','비버'],['🐋','고래'],['🛷','썰매'],['🏞️','호수']]},
+    {country:'호주',name:'시드니',icon:'🇦🇺',gameMode:1,line:'자음과 모음을 합쳐 글자를 만들어요!',words:[['🐨','코알라'],['🦘','캥거루'],['🐊','악어'],['🪸','산호초'],['🐑','양'],['⭐','별'],['🌊','바다'],['🏖️','해변']]}
   ];
   buttons.forEach((b,i) => {
     b.className = 'level' + (i===0?' current':'');
@@ -42,10 +42,10 @@
   });
   document.querySelector('.avatar span:last-child').textContent='소리섬 탐험대';
   document.querySelector('.mission b').textContent=' 8가지 놀이로 오늘의 보물을 모아요';
-  document.querySelector('.quest p').textContent='듣기, 글자 만들기, 쓰기까지 랜덤 모험을 떠나요!';
-  function paintWorld(){const stop=journeyStops[journeyStep%journeyStops.length];travelTag.textContent='🧭 여행 '+(journeyStep+1)+' · '+stop.name;worldTitle.textContent=journeyStep?stop.name+'에 도착했어요!':'소리섬에서 출발해요!';worldNote.textContent=stop.line;destinationSign.textContent=stop.name;travelStatus.textContent=journeyStep?stop.icon+' '+stop.name+' 탐험 중 · 별 '+stars+'개':'지도를 따라 모험을 떠나요!';}
+  document.querySelector('.quest p').textContent='미션을 마칠 때마다 다른 나라로 떠나요!';
+  function paintWorld(){const stop=journeyStops[journeyStep%journeyStops.length];travelTag.textContent='🧭 세계 여행 '+(journeyStep+1)+' · '+stop.country;worldTitle.textContent=journeyStep?stop.country+' '+stop.name+'에 도착했어요!':stop.country+'에서 출발해요!';worldNote.textContent=stop.line;destinationSign.textContent=stop.icon+' '+stop.name;travelStatus.textContent=journeyStep?stop.icon+' '+stop.country+' 한글 미션 · 별 '+stars+'개':'나라별 한글 미션을 시작해요!';}
   paintWorld();
-  document.querySelector('#start').onclick=()=>start(8);
+  document.querySelector('#start').onclick=()=>start(journeyStops[journeyStep%journeyStops.length].gameMode);
   const voiceMapScript = document.createElement('script');
   voiceMapScript.src = 'audio/voice-map.js';
   document.head.appendChild(voiceMapScript);
@@ -123,24 +123,25 @@
     meter.style.width=Math.min(100,index/limit()*100)+'%';
     buttons.forEach((b,i)=>b.classList.toggle('current',i===mode));
   }
-  function poolSize(which){return [14,84,20,14,allSyllables.length,allSyllables.length,words.length,words.length][which]||0;}
+  function poolSize(which){const count=journeyStops[journeyStep%journeyStops.length].words.length;return [count,84,count,14,allSyllables.length,allSyllables.length,count,count][which]||0;}
   function limit(){return mode===8?mixSequence.length:poolSize(mode);}
   function start(which){clearTimeout(nextTimer);clearTimeout(travelTimer);travelling=false;worldStage.classList.remove('traveling','arrived');stopSpeech();mode=which;index=0;locked=false;activeMode=which;if(mode===8){mixSequence=shuffle([0,1,2,3,4,5,6,7]);mixOrders={};for(let m=0;m<8;m++)mixOrders[m]=shuffle(Array.from({length:poolSize(m)},(_,i)=>i));}const pool=mode===8?mixSequence.length:poolSize(mode);order=shuffle(Array.from({length:pool},(_,i)=>i));render();zone.scrollIntoView({behavior:'smooth',block:'start'});}
-  function beginJourney(nextMode){if(travelling)return;travelling=true;const nextStep=journeyStep+1,stop=journeyStops[nextStep%journeyStops.length];worldStage.classList.remove('arrived');worldStage.classList.add('traveling');travelTag.textContent='🚩 다음 목적지 · '+stop.name;worldTitle.textContent='새로운 여행을 떠나요!';worldNote.textContent=stop.icon+' '+stop.name+'으로 출발해요!';destinationSign.textContent='→ '+stop.name;travelStatus.textContent='여행 가방을 메고 출발!';travelTimer=setTimeout(()=>{worldStage.classList.remove('traveling');worldStage.classList.add('arrived');journeyStep=nextStep;localStorage.setItem('soriJourneyStep',String(journeyStep));paintWorld();travelStatus.textContent='🎉 '+stop.name+' 도착! 보물을 찾아봐요!';travelTimer=setTimeout(()=>{travelling=false;start(nextMode);},1100);},1850);}
+  function beginJourney(){if(travelling)return;travelling=true;const nextStep=journeyStep+1,stop=journeyStops[nextStep%journeyStops.length];worldStage.classList.remove('arrived');worldStage.classList.add('traveling');travelTag.textContent='🚩 다음 나라 · '+stop.country;worldTitle.textContent='다음 나라로 출발해요!';worldNote.textContent=stop.icon+' '+stop.country+' '+stop.name으로 떠나요!';destinationSign.textContent='→ '+stop.name;travelStatus.textContent='🧳 여권을 챙기고 출발!';travelTimer=setTimeout(()=>{worldStage.classList.remove('traveling');worldStage.classList.add('arrived');journeyStep=nextStep;localStorage.setItem('soriJourneyStep',String(journeyStep));paintWorld();travelStatus.textContent='🎉 '+stop.country+' 도착! '+labels[stop.gameMode][1]+' 미션을 해봐요!';travelTimer=setTimeout(()=>{travelling=false;start(stop.gameMode);},1100);},1850);}
   function makeQuestion(){
     activeMode=mode===8?mixSequence[index]:mode;
     const n=mode===8?mixOrders[activeMode].pop():(order[index] ?? index);
-    if(activeMode===0){return {title:'첫소리를 찾아요!', display:syllables[n], sound:syllables[n], answer:consonants[n], options:shuffle([consonants[n],...shuffle(consonants.filter(x=>x!==consonants[n])).slice(0,2)])};}
+    const travelStop=journeyStops[journeyStep%journeyStops.length], countryWords=travelStop.words;
+    if(activeMode===0){const [emoji,word]=countryWords[n];const indexByInitial=[0,2,3,5,6,7,9,11,12,14,15,16,17,18].indexOf(Math.floor((word.charCodeAt(0)-0xac00)/588));const answer=consonants[indexByInitial]||'ㅇ';return {title:travelStop.country+' 첫소리를 찾아요!',display:emoji,sound:word,answer,options:shuffle([answer,...shuffle(consonants.filter(x=>x!==answer)).slice(0,2)])};}
     if(activeMode===1){const c=Math.floor(n/6),v=n%6, target=compose(c,v); return {title:'글자 조각을 골라요!', display:consonants[c]+' + ?', sound:target, hint:'“'+target+'”를 만들려면 어떤 모음이 필요할까요?', answer:vowels[v],options:shuffle([vowels[v],...shuffle(vowels.filter(x=>x!==vowels[v])).slice(0,2)])};}
-    if(activeMode===2){const [emoji,word]=words[n]; return {title:'그림에 맞는 낱말은?',display:emoji,sound:word,answer:word,options:shuffle([word,...shuffle(words.map(x=>x[1]).filter(x=>x!==word)).slice(0,2)])};}
+    if(activeMode===2){const [emoji,word]=countryWords[n]; return {title:travelStop.country+' 그림 낱말 찾기!',display:emoji,sound:word,answer:word,options:shuffle([word,...shuffle(countryWords.map(x=>x[1]).filter(x=>x!==word)).slice(0,2)])};}
     if(activeMode===5){const target=allSyllables[n];const others=shuffle(allSyllables.filter(x=>x!==target));return {title:'소리를 듣고 글자를 찾아요!',display:'👂',sound:target,hint:'소리 듣기를 눌러봐요',answer:target,options:shuffle([target,...others.slice(0,2)])};}
-    if(activeMode===6||activeMode===7){const [emoji,word]=words[n];return {display:emoji,sound:word,word};}
+    if(activeMode===6||activeMode===7){const [emoji,word]=countryWords[n];return {display:emoji,sound:word,word};}
     const target=allSyllables[n%allSyllables.length];
     return {title:activeMode===3?'손가락으로 따라 써요!':'어떤 글자일까요?',display:target,sound:target};
   }
   function render(){
     update();
-    if(index>=limit()){card.innerHTML='<div class="reward"><div class="stars">⭐️🧭⭐️</div><h2>미션 완료!</h2><p>'+limit()+'개의 미션을 해냈어요! 지도에 다음 여행지가 열렸어요.</p><button class="again next-stage">🧭 다음 여행지로 출발!</button> <button class="again replay">다시 도전하기</button></div>';card.querySelector('.next-stage').onclick=()=>beginJourney((mode+1)%labels.length);card.querySelector('.replay').onclick=()=>start(mode);return;}
+    if(index>=limit()){const nextStop=journeyStops[(journeyStep+1)%journeyStops.length];card.innerHTML='<div class="reward"><div class="stars">⭐️🧭⭐️</div><h2>미션 완료!</h2><p>'+limit()+'개를 해냈어요! 다음 목적지는 '+nextStop.country+' '+nextStop.name+'이에요.</p><button class="again next-stage">🧭 '+nextStop.country+'로 출발!</button> <button class="again replay">다시 도전하기</button></div>';card.querySelector('.next-stage').onclick=()=>beginJourney();card.querySelector('.replay').onclick=()=>start(mode);return;}
     current=makeQuestion(); locked=false;
     if(activeMode===3||activeMode===4){renderPractice();return;}
     if(activeMode===6){renderTrain();return;}
