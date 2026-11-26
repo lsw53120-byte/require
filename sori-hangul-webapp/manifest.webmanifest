@@ -1,0 +1,21 @@
+{
+  "id": "./",
+  "name": "소리한글 어드벤처",
+  "short_name": "소리한글",
+  "description": "게임처럼 즐기는 한글 모험",
+  "lang": "ko-KR",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#eaf8ff",
+  "theme_color": "#167ddc",
+  "icons": [
+    {
+      "src": "./icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
