@@ -88,21 +88,31 @@
       if (feedback) feedback.textContent = '음성을 재생하지 못했어요. 다시 눌러 주세요.';
     }
   }
+  let koreanVoiceCache = [];
+  function refreshKoreanVoices() {
+    if (!('speechSynthesis' in window)) return;
+    const voices = speechSynthesis.getVoices();
+    koreanVoiceCache = voices.filter(v => /^ko(?:[-_]|$)/i.test(v.lang));
+  }
+  if ('speechSynthesis' in window) {
+    refreshKoreanVoices();
+    speechSynthesis.addEventListener?.('voiceschanged', refreshKoreanVoices);
+  }
   function speak(value) {
     stopSpeech();
     const token = speechToken;
     const text = String(value).trim();
     if ('speechSynthesis' in window && 'SpeechSynthesisUtterance' in window) {
+      refreshKoreanVoices();
       const synth = window.speechSynthesis;
-      const voices = synth.getVoices();
-      const korean = voices.find(v => /^ko(-|_)?kr$/i.test(v.lang) && /google/i.test(v.name))
-        || voices.find(v => /^ko(-|_)?kr$/i.test(v.lang))
-        || voices.find(v => /^ko(-|_)/i.test(v.lang));
+      const korean = koreanVoiceCache.find(v => /^ko[-_]kr$/i.test(v.lang) && /google/i.test(v.name))
+        || koreanVoiceCache.find(v => /^ko[-_]kr$/i.test(v.lang))
+        || koreanVoiceCache[0];
       if (korean) {
         const u = new SpeechSynthesisUtterance(text);
-        u.lang = 'ko-KR'; u.voice = korean; u.rate = .85; u.volume = 1;
+        u.lang = 'ko-KR'; u.voice = korean; u.rate = .72; u.pitch = 1; u.volume = 1;
         u.onerror = () => { if (token === speechToken) speakRecording(text, token); };
-        try { synth.speak(u); return; } catch (_) { /* Use the recording below. */ }
+        try { synth.speak(u); return; } catch (_) { /* Use the recorded Korean voice below. */ }
       }
     }
     speakRecording(text, token);
