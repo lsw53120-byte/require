@@ -67,6 +67,29 @@
   document.head.appendChild(voiceMapScript);
   const recordedVoice = new Audio('audio/voice.mp3');
   recordedVoice.preload = 'metadata';
+  let speechGainContext = null;
+  function prepareLouderRecording() {
+    const Context = window.AudioContext || window.webkitAudioContext;
+    if (!Context) return;
+    try {
+      if (!speechGainContext) {
+        speechGainContext = new Context();
+        const source = speechGainContext.createMediaElementSource(recordedVoice);
+        const compressor = speechGainContext.createDynamicsCompressor();
+        const gain = speechGainContext.createGain();
+        compressor.threshold.value = -25;
+        compressor.knee.value = 20;
+        compressor.ratio.value = 6;
+        compressor.attack.value = 0.005;
+        compressor.release.value = 0.24;
+        gain.gain.value = 2.5;
+        source.connect(compressor);
+        compressor.connect(gain);
+        gain.connect(speechGainContext.destination);
+      }
+      if (speechGainContext.state === 'suspended') speechGainContext.resume().catch(() => {});
+    } catch (_) { /* Keep normal playback available on browsers without audio processing. */ }
+  }
   let speechToken = 0, clipEnd = 0, clipTimer = 0, clipSeekTimer = 0;
   function stopSpeech() {
     speechToken++;
@@ -139,6 +162,12 @@
     stopSpeech();
     const token = speechToken;
     const text = String(value).trim();
+    const hasRecordedClip = !!(window.SORI_VOICE_MAP && window.SORI_VOICE_MAP[text]);
+    if (hasRecordedClip) {
+      prepareLouderRecording();
+      speakRecording(text, token);
+      return;
+    }
     if ('speechSynthesis' in window && 'SpeechSynthesisUtterance' in window) {
       refreshKoreanVoices();
       const synth = window.speechSynthesis;
@@ -154,7 +183,7 @@
       const hasRecordedWord = !!(window.SORI_VOICE_MAP && window.SORI_VOICE_MAP[text]);
       if (!hasRecordedWord) {
         const u = new SpeechSynthesisUtterance(text);
-        u.lang = 'ko-KR'; u.rate = .9; u.pitch = 1; u.volume = 1;
+        u.lang = 'ko-KR'; u.rate = 1; u.pitch = 1; u.volume = 1;
         u.onerror = () => { if (token === speechToken) speakRecording(text, token); };
         try { synth.speak(u); return; } catch (_) { /* Show the audio fallback message below. */ }
       }
