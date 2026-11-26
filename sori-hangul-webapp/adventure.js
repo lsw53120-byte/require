@@ -51,10 +51,12 @@
   document.head.appendChild(voiceMapScript);
   const recordedVoice = new Audio('audio/voice.mp3');
   recordedVoice.preload = 'metadata';
-  let speechToken = 0, clipEnd = 0, clipTimer = 0;
+  let speechToken = 0, clipEnd = 0, clipTimer = 0, clipSeekTimer = 0;
   function stopSpeech() {
     speechToken++;
     clearInterval(clipTimer);
+    clearTimeout(clipSeekTimer);
+    recordedVoice.onseeked = null;
     recordedVoice.pause();
     if ('speechSynthesis' in window) speechSynthesis.cancel();
   }
@@ -63,18 +65,22 @@
     const clip = window.SORI_VOICE_MAP && window.SORI_VOICE_MAP[text];
     if (!clip) {
       const feedback = card.querySelector('.feedback');
-      if (feedback) feedback.textContent = '음성을 준비하지 못했어요. 다시 눌러 주세요.';
+      if (feedback) feedback.textContent = '이 글자의 녹음 음성이 없어요. 휴대폰 한국어 음성을 확인해 주세요.';
       return;
     }
-    clipEnd = clip[0] + clip[1];
-    try {
-      recordedVoice.currentTime = clip[0];
+    let started = false;
+    const startClip = () => {
+      if (started || token !== speechToken) return;
+      started = true;
+      recordedVoice.onseeked = null;
+      clearTimeout(clipSeekTimer);
+      clipEnd = clip[0] + clip[1];
       const play = recordedVoice.play();
       clipTimer = setInterval(() => {
         if (token !== speechToken || recordedVoice.currentTime >= clipEnd) {
           recordedVoice.pause(); clearInterval(clipTimer);
         }
-      }, 50);
+      }, 40);
       if (play && play.catch) play.catch(() => {
         clearInterval(clipTimer);
         if (token === speechToken) {
@@ -82,8 +88,23 @@
           if (feedback) feedback.textContent = '음성을 재생하지 못했어요. 소리 듣기를 다시 눌러 주세요.';
         }
       });
+    };
+    try {
+      recordedVoice.pause();
+      const alreadyThere = recordedVoice.readyState >= 2 && Math.abs(recordedVoice.currentTime - clip[0]) < .02;
+      recordedVoice.onseeked = startClip;
+      if (alreadyThere) startClip();
+      else recordedVoice.currentTime = clip[0];
+      clipSeekTimer = setTimeout(() => {
+        if (!started && token === speechToken) {
+          recordedVoice.onseeked = null;
+          const feedback = card.querySelector('.feedback');
+          if (feedback) feedback.textContent = '음성을 불러오지 못했어요. 다시 눌러 주세요.';
+        }
+      }, 3500);
     } catch (_) {
-      clearInterval(clipTimer);
+      recordedVoice.onseeked = null;
+      clearTimeout(clipSeekTimer);
       const feedback = card.querySelector('.feedback');
       if (feedback) feedback.textContent = '음성을 재생하지 못했어요. 다시 눌러 주세요.';
     }
@@ -110,7 +131,7 @@
         || koreanVoiceCache[0];
       if (korean) {
         const u = new SpeechSynthesisUtterance(text);
-        u.lang = 'ko-KR'; u.voice = korean; u.rate = .72; u.pitch = 1; u.volume = 1;
+        u.lang = 'ko-KR'; u.voice = korean; u.rate = .9; u.pitch = 1; u.volume = 1;
         u.onerror = () => { if (token === speechToken) speakRecording(text, token); };
         try { synth.speak(u); return; } catch (_) { /* Use the recorded Korean voice below. */ }
       }
@@ -126,7 +147,7 @@
   function poolSize(which){const count=journeyStops[journeyStep%journeyStops.length].words.length;return [count,84,count,14,allSyllables.length,allSyllables.length,count,count][which]||0;}
   function limit(){return mode===8?mixSequence.length:poolSize(mode);}
   function start(which){clearTimeout(nextTimer);clearTimeout(travelTimer);travelling=false;worldStage.classList.remove('traveling','arrived');stopSpeech();mode=which;index=0;locked=false;activeMode=which;if(mode===8){mixSequence=shuffle([0,1,2,3,4,5,6,7]);mixOrders={};for(let m=0;m<8;m++)mixOrders[m]=shuffle(Array.from({length:poolSize(m)},(_,i)=>i));}const pool=mode===8?mixSequence.length:poolSize(mode);order=shuffle(Array.from({length:pool},(_,i)=>i));render();zone.scrollIntoView({behavior:'smooth',block:'start'});}
-  function beginJourney(){if(travelling)return;travelling=true;const nextStep=journeyStep+1,stop=journeyStops[nextStep%journeyStops.length];worldStage.classList.remove('arrived');worldStage.classList.add('traveling');travelTag.textContent='🚩 다음 나라 · '+stop.country;worldTitle.textContent='다음 나라로 출발해요!';worldNote.textContent=stop.icon+' '+stop.country+' '+stop.name으로 떠나요!';destinationSign.textContent='→ '+stop.name;travelStatus.textContent='🧳 여권을 챙기고 출발!';travelTimer=setTimeout(()=>{worldStage.classList.remove('traveling');worldStage.classList.add('arrived');journeyStep=nextStep;localStorage.setItem('soriJourneyStep',String(journeyStep));paintWorld();travelStatus.textContent='🎉 '+stop.country+' 도착! '+labels[stop.gameMode][1]+' 미션을 해봐요!';travelTimer=setTimeout(()=>{travelling=false;start(stop.gameMode);},1100);},1850);}
+  function beginJourney(){if(travelling)return;travelling=true;const nextStep=journeyStep+1,stop=journeyStops[nextStep%journeyStops.length];worldStage.classList.remove('arrived');worldStage.classList.add('traveling');travelTag.textContent='🚩 다음 나라 · '+stop.country;worldTitle.textContent='다음 나라로 출발해요!';worldNote.textContent=stop.icon+' '+stop.country+' '+stop.name+'으로 떠나요!';destinationSign.textContent='→ '+stop.name;travelStatus.textContent='🧳 여권을 챙기고 출발!';travelTimer=setTimeout(()=>{worldStage.classList.remove('traveling');worldStage.classList.add('arrived');journeyStep=nextStep;localStorage.setItem('soriJourneyStep',String(journeyStep));paintWorld();travelStatus.textContent='🎉 '+stop.country+' 도착! '+labels[stop.gameMode][1]+' 미션을 해봐요!';travelTimer=setTimeout(()=>{travelling=false;start(stop.gameMode);},1100);},1850);}
   function makeQuestion(){
     activeMode=mode===8?mixSequence[index]:mode;
     const n=mode===8?mixOrders[activeMode].pop():(order[index] ?? index);
