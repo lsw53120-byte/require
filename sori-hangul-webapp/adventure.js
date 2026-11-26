@@ -10,7 +10,14 @@
   const shuffle = a => {const x=[...a];for(let i=x.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[x[i],x[j]]=[x[j],x[i]];}return x;};
   let mode = 0, activeMode = 0, index = 0, locked = false, current = null, order = [], mixSequence = [], mixOrders = {}, nextTimer = null;
   let stars = Number(localStorage.getItem('soriStars') || 0);
+  let journeyStep = Number(localStorage.getItem('soriJourneyStep') || 0), travelling = false, travelTimer = 0;
   const zone = document.querySelector('#playZone'), card = zone.querySelector('.play-card');
+  const worldStage = document.querySelector('#worldStage');
+  const worldTitle = document.querySelector('#worldTitle');
+  const worldNote = document.querySelector('#worldNote');
+  const travelTag = document.querySelector('#travelTag');
+  const travelStatus = document.querySelector('#travelStatus');
+  const destinationSign = document.querySelector('#destination');
   const path = document.querySelector('.path');
   const buttons = [...document.querySelectorAll('.level')];
   for (let i=3;i<9;i++) { const b=document.createElement('button'); b.className='level'; path.appendChild(b); buttons.push(b); }
@@ -18,6 +25,16 @@
   const progress = document.querySelector('.section-head > span');
   const meter = document.querySelector('#meter');
   const labels = [['🔊','소리 찾기'],['🧩','글자 만들기'],['🎨','그림 낱말'],['✍️','따라 쓰기'],['🎲','랜덤 읽기'],['👂','소리 탐정'],['🚂','낱말 기차'],['🎁','빈칸 보물'],['🌈','오늘의 모험']];
+  const journeyStops = [
+    {name:'소리섬',icon:'🏝️',line:'바닷길을 건너 첫 글자 보물을 찾아요!'},
+    {name:'모음 호수',icon:'🛶',line:'반짝이는 모음 조각이 기다려요!'},
+    {name:'글자 숲',icon:'🌳',line:'숲속 친구들과 글자를 만들어요!'},
+    {name:'낱말 사막',icon:'🐪',line:'모래 속 낱말 보물을 찾아요!'},
+    {name:'별빛 산',icon:'🌟',line:'별을 따라 읽기 모험을 이어가요!'},
+    {name:'구름 마을',icon:'☁️',line:'구름 다리를 건너 다음 글자를 만나요!'},
+    {name:'무지개 항구',icon:'🌈',line:'배를 타고 새로운 소리를 찾아요!'},
+    {name:'한글 왕국',icon:'🏰',line:'모은 글자 보물로 왕국 축제를 열어요!'}
+  ];
   buttons.forEach((b,i) => {
     b.className = 'level' + (i===0?' current':'');
     b.innerHTML = '<span class="level-icon l'+(i%3+1)+'">'+labels[i][0]+'</span><b>'+labels[i][1]+'</b><small>자유롭게 놀기</small>';
@@ -26,6 +43,8 @@
   document.querySelector('.avatar span:last-child').textContent='소리섬 탐험대';
   document.querySelector('.mission b').textContent=' 8가지 놀이로 오늘의 보물을 모아요';
   document.querySelector('.quest p').textContent='듣기, 글자 만들기, 쓰기까지 랜덤 모험을 떠나요!';
+  function paintWorld(){const stop=journeyStops[journeyStep%journeyStops.length];travelTag.textContent='🧭 여행 '+(journeyStep+1)+' · '+stop.name;worldTitle.textContent=journeyStep?stop.name+'에 도착했어요!':'소리섬에서 출발해요!';worldNote.textContent=stop.line;destinationSign.textContent=stop.name;travelStatus.textContent=journeyStep?stop.icon+' '+stop.name+' 탐험 중 · 별 '+stars+'개':'지도를 따라 모험을 떠나요!';}
+  paintWorld();
   document.querySelector('#start').onclick=()=>start(8);
   const voiceMapScript = document.createElement('script');
   voiceMapScript.src = 'audio/voice-map.js';
@@ -96,7 +115,8 @@
   }
   function poolSize(which){return [14,84,20,14,allSyllables.length,allSyllables.length,words.length,words.length][which]||0;}
   function limit(){return mode===8?mixSequence.length:poolSize(mode);}
-  function start(which){clearTimeout(nextTimer);stopSpeech();mode=which;index=0;locked=false;activeMode=which;if(mode===8){mixSequence=shuffle([0,1,2,3,4,5,6,7]);mixOrders={};for(let m=0;m<8;m++)mixOrders[m]=shuffle(Array.from({length:poolSize(m)},(_,i)=>i));}const pool=mode===8?mixSequence.length:poolSize(mode);order=shuffle(Array.from({length:pool},(_,i)=>i));render();zone.scrollIntoView({behavior:'smooth',block:'start'});}
+  function start(which){clearTimeout(nextTimer);clearTimeout(travelTimer);travelling=false;worldStage.classList.remove('traveling','arrived');stopSpeech();mode=which;index=0;locked=false;activeMode=which;if(mode===8){mixSequence=shuffle([0,1,2,3,4,5,6,7]);mixOrders={};for(let m=0;m<8;m++)mixOrders[m]=shuffle(Array.from({length:poolSize(m)},(_,i)=>i));}const pool=mode===8?mixSequence.length:poolSize(mode);order=shuffle(Array.from({length:pool},(_,i)=>i));render();zone.scrollIntoView({behavior:'smooth',block:'start'});}
+  function beginJourney(nextMode){if(travelling)return;travelling=true;const nextStep=journeyStep+1,stop=journeyStops[nextStep%journeyStops.length];worldStage.classList.remove('arrived');worldStage.classList.add('traveling');travelTag.textContent='🚩 다음 목적지 · '+stop.name;worldTitle.textContent='새로운 여행을 떠나요!';worldNote.textContent=stop.icon+' '+stop.name+'으로 출발해요!';destinationSign.textContent='→ '+stop.name;travelStatus.textContent='여행 가방을 메고 출발!';travelTimer=setTimeout(()=>{worldStage.classList.remove('traveling');worldStage.classList.add('arrived');journeyStep=nextStep;localStorage.setItem('soriJourneyStep',String(journeyStep));paintWorld();travelStatus.textContent='🎉 '+stop.name+' 도착! 보물을 찾아봐요!';travelTimer=setTimeout(()=>{travelling=false;start(nextMode);},1100);},1850);}
   function makeQuestion(){
     activeMode=mode===8?mixSequence[index]:mode;
     const n=mode===8?mixOrders[activeMode].pop():(order[index] ?? index);
@@ -110,7 +130,7 @@
   }
   function render(){
     update();
-    if(index>=limit()){card.innerHTML='<div class="reward"><div class="stars">⭐️⭐️⭐️</div><h2>미션 완료!</h2><p>'+limit()+'개를 모두 해냈어요! 다음 놀이도 열렸어요.</p><button class="again next-stage">다음 단계 →</button> <button class="again replay">다시 놀기</button></div>';card.querySelector('.next-stage').onclick=()=>start((mode+1)%labels.length);card.querySelector('.replay').onclick=()=>start(mode);return;}
+    if(index>=limit()){card.innerHTML='<div class="reward"><div class="stars">⭐️🧭⭐️</div><h2>미션 완료!</h2><p>'+limit()+'개의 미션을 해냈어요! 지도에 다음 여행지가 열렸어요.</p><button class="again next-stage">🧭 다음 여행지로 출발!</button> <button class="again replay">다시 도전하기</button></div>';card.querySelector('.next-stage').onclick=()=>beginJourney((mode+1)%labels.length);card.querySelector('.replay').onclick=()=>start(mode);return;}
     current=makeQuestion(); locked=false;
     if(activeMode===3||activeMode===4){renderPractice();return;}
     if(activeMode===6){renderTrain();return;}
