@@ -75,17 +75,24 @@
       if (!speechGainContext) {
         speechGainContext = new Context();
         const source = speechGainContext.createMediaElementSource(recordedVoice);
-        const compressor = speechGainContext.createDynamicsCompressor();
+        const voiceCompressor = speechGainContext.createDynamicsCompressor();
         const gain = speechGainContext.createGain();
-        compressor.threshold.value = -25;
-        compressor.knee.value = 20;
-        compressor.ratio.value = 6;
-        compressor.attack.value = 0.005;
-        compressor.release.value = 0.24;
-        gain.gain.value = 2.5;
-        source.connect(compressor);
-        compressor.connect(gain);
-        gain.connect(speechGainContext.destination);
+        const peakLimiter = speechGainContext.createDynamicsCompressor();
+        voiceCompressor.threshold.value = -35;
+        voiceCompressor.knee.value = 18;
+        voiceCompressor.ratio.value = 12;
+        voiceCompressor.attack.value = 0.003;
+        voiceCompressor.release.value = 0.18;
+        gain.gain.value = 3.5;
+        peakLimiter.threshold.value = -1;
+        peakLimiter.knee.value = 0;
+        peakLimiter.ratio.value = 20;
+        peakLimiter.attack.value = 0.002;
+        peakLimiter.release.value = 0.12;
+        source.connect(voiceCompressor);
+        voiceCompressor.connect(gain);
+        gain.connect(peakLimiter);
+        peakLimiter.connect(speechGainContext.destination);
       }
       if (speechGainContext.state === 'suspended') speechGainContext.resume().catch(() => {});
     } catch (_) { /* Keep normal playback available on browsers without audio processing. */ }
