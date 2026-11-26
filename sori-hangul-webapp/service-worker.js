@@ -1,5 +1,5 @@
-const CACHE_NAME = "sori-hangul-v1";
-const CORE_FILES = ["./", "./index.html", "./adventure.js", "./pwa-install.js", "./manifest.webmanifest", "./icon.svg"];
+const CACHE_NAME = "sori-hangul-v2";
+const CORE_FILES = ["./", "./index.html", "./adventure.js", "./pwa-install.js", "./manifest.webmanifest", "./icon.svg", "./audio/voice-map.js", "./audio/voice.mp3"];
 self.addEventListener("install", event => {
   event.waitUntil(caches.open(CACHE_NAME).then(cache => cache.addAll(CORE_FILES)).then(() => self.skipWaiting()));
 });
