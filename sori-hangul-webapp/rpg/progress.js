@@ -9,7 +9,14 @@
   try { stored=JSON.parse(localStorage.getItem(key)||'null'); } catch (_) {}
   const valid=s=>s&&s.version===1&&Number.isInteger(s.journey)&&s.journey>=0&&Number.isInteger(s.level)&&s.level>=0&&s.level<8&&Number.isInteger(s.stars)&&s.stars>=0&&Number.isInteger(s.energy)&&s.energy>=0&&s.energy<=3&&Array.isArray(s.levels)&&s.levels.length===8&&s.levels.every(p=>p&&typeof p.question==='string'&&typeof p.answer==='string');
   if(!valid(stored))stored=null;
-  if(stored)start.textContent='🚂 이어서 모험하기';
+  if(stored){
+    start.textContent='🚂 이어서 모험하기';
+    const destination=destinations[stored.journey%destinations.length];
+    worldChip.textContent='Lv.'+(stored.journey+1)+' '+destination.landmark+' '+destination.country+' · 난이도 '+(Math.min(stored.journey,4)+1);
+    $('stageCount').textContent='🌍 '+(stored.level+1)+' / '+stored.levels.length;
+    $('stars').textContent='⭐ '+stored.stars;
+    energyChip.textContent='에너지 '+'❤️'.repeat(stored.energy)+'🤍'.repeat(3-stored.energy);
+  }
   let active=false;
   function save(){
     if(!active||state==='ready')return;
