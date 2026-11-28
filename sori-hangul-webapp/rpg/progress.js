@@ -1,5 +1,6 @@
 (() => {
   const key='hangul-world-rpg-progress-v1';
+  const freshKey='hangul-world-rpg-new-adventure-v1';
   const note=document.querySelector('.note'); if(note)note.remove();
   const start=document.getElementById('start');
   const home=document.createElement('button');home.className='secondary';home.textContent='🏠 홈';
@@ -10,6 +11,9 @@
   try { stored=JSON.parse(localStorage.getItem(key)||'null'); } catch (_) {}
   const valid=s=>s&&s.version===1&&Number.isInteger(s.journey)&&s.journey>=0&&Number.isInteger(s.level)&&s.level>=0&&s.level<8&&Number.isInteger(s.stars)&&s.stars>=0&&Number.isInteger(s.energy)&&s.energy>=0&&s.energy<=3&&Array.isArray(s.levels)&&s.levels.length===8&&s.levels.every(p=>p&&typeof p.question==='string'&&typeof p.answer==='string');
   if(!valid(stored))stored=null;
+  let freshStored=null;
+  try { freshStored=JSON.parse(localStorage.getItem(freshKey)||'null'); } catch (_) {}
+  if(!valid(freshStored))freshStored=null;
   if(stored){
     start.textContent='🚂 이어서 모험하기';
     const destination=destinations[stored.journey%destinations.length];
@@ -19,20 +23,22 @@
     energyChip.textContent='에너지 '+'❤️'.repeat(stored.energy)+'🤍'.repeat(3-stored.energy);
   }
   let active=false;
+  let activeKey=key;
   function save(){
     if(!active||state==='ready')return;
-    try {localStorage.setItem(key,JSON.stringify({version:1,journey,level,stars,energy,state,levels,completed:[...completedLevels]}));return true;}
+    try {localStorage.setItem(activeKey,JSON.stringify({version:1,journey,level,stars,energy,state,levels,completed:[...completedLevels]}));return true;}
     catch(_){$('feedback').textContent='이 기기에서 기록을 저장하지 못했어요. 브라우저 저장 공간을 확인해 주세요.';return false;}
   }
   home.onclick=()=>{if(!active||save())location.reload()};
   const oldSetState=setState;setState=function(s){oldSetState(s);queueMicrotask(save)};
   document.addEventListener('click',()=>queueMicrotask(save));
   const originalStart=start.onclick;
-  start.onclick=()=>{
+  function resume(data,slot){
     active=true;
+    activeKey=slot;
     home.hidden=false;
-    if(!stored){originalStart();return}
-    const data=stored;stored=null;journey=data.journey;level=data.level;stars=data.stars;energy=data.energy;completedLevels=new Set(data.completed||[]);
+    if(!data){originalStart();return}
+    journey=data.journey;level=data.level;stars=data.stars;energy=data.energy;completedLevels=new Set(data.completed||[]);
     levels.splice(0,levels.length,...data.levels);worldChip.textContent='Lv.'+(journey+1)+' '+destinations[journey%destinations.length].landmark+' '+destinations[journey%destinations.length].country+' · 난이도 '+(Math.min(journey,4)+1);
     $('stars').textContent='⭐ '+stars;showEnergy();
     if(energy===0){level=Math.max(0,level-1);energy=3;showEnergy();}
@@ -41,7 +47,20 @@
       if(level<levels.length-1){$('controls').appendChild(button('다음 지역으로 🚂','primary',()=>{level++;begin()}))}
       else {$('controls').appendChild(button('레벨 업! 다음 나라로 🚂','primary',()=>{journey++;level=0;energy=3;showEnergy();completedLevels.clear();applyDestination();begin()}))}
     }else begin();
-  };
+  }
+  start.onclick=()=>resume(stored,key);
+  if(stored){
+    const freshStart=document.createElement('button');freshStart.className='secondary';freshStart.textContent='🌱 레벨 1부터 새 모험';freshStart.style.cssText='display:block;margin:12px auto';
+    freshStart.onclick=()=>{
+      if(freshStored&&!confirm('이전에 시작한 새 모험 기록을 지우고 레벨 1부터 다시 시작할까요? 기존 모험 기록은 유지됩니다.'))return;
+      active=true;activeKey=freshKey;journey=0;level=0;stars=0;energy=3;completedLevels.clear();applyDestination();$('stars').textContent='⭐ 0';showEnergy();originalStart();
+    };
+    $('controls').appendChild(freshStart);
+    if(freshStored){
+      const freshResume=document.createElement('button');freshResume.className='secondary';freshResume.textContent='🌱 새 모험 이어하기';freshResume.style.cssText='display:block;margin:12px auto';
+      freshResume.onclick=()=>resume(freshStored,freshKey);$('controls').appendChild(freshResume);
+    }
+  }
   if('serviceWorker' in navigator && location.protocol.startsWith('http')){
     navigator.serviceWorker.register('../service-worker.js',{scope:'../'}).catch(()=>{});
   }
