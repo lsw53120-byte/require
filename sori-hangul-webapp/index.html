@@ -1,87 +1,12 @@
-<!doctype html><html lang="ko"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#167ddc"><title>소리한글 어드벤처</title><style>
-@import url('https://fonts.googleapis.com/css2?family=Jua&family=Noto+Sans+KR:wght@500;700;800&display=swap');:root{--navy:#24304c;--blue:#1788e8;--yellow:#ffd84f;--orange:#ff7b43;--pink:#ff5d94;--green:#36c997}*{box-sizing:border-box}body{margin:0;background:#d9eaf7;color:var(--navy);font-family:'Noto Sans KR',sans-serif}.game{width:min(100%,520px);min-height:100vh;margin:auto;background:#eaf8ff;overflow:hidden;box-shadow:0 0 45px #204b6a33}.top{height:64px;background:#167bd6;color:#fff;display:flex;align-items:center;justify-content:space-between;padding:0 18px}.avatar{display:flex;align-items:center;gap:8px;font-family:Jua;font-size:18px}.avatar-face{display:grid;place-items:center;background:#ffe5a5;width:36px;height:36px;border:3px solid #fff;border-radius:50%;font-size:23px}.stats{display:flex;gap:8px}.stat{display:flex;align-items:center;gap:3px;background:#116abd;border:1px solid #5db7ed;border-radius:99px;padding:6px 9px;font:13px Jua}.stage{position:relative;min-height:375px;padding:22px 20px 28px;background:linear-gradient(#2ac5eb 0 36%,#7fe4f0 36% 42%,#f9d66c 42% 70%,#70d28f 70%);overflow:hidden}.stage:before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 75% 20%,#fff7a766 0 35px,transparent 36px),linear-gradient(166deg,transparent 48%,#ffffff32 49% 50%,transparent 51%);pointer-events:none}.cloud{position:absolute;background:#e8fbff;border-radius:99px;width:85px;height:22px;top:75px;left:-10px;box-shadow:35px -9px 0 -4px #e8fbff}.cloud.two{top:120px;left:auto;right:-28px;transform:scale(.7)}.stage-content{position:relative;z-index:1}.quest-label{display:inline-block;background:#ff658d;color:#fff;border:3px solid #fff;border-radius:12px;padding:7px 12px;font:14px Jua;box-shadow:0 4px 0 #c84170;transform:rotate(-2deg)}.quest h1{font:31px/1.12 Jua;color:#fff;text-shadow:0 3px 0 #1263aa;margin:16px 0 4px}.quest p{color:#fff;font-size:12px;margin:0}.character{position:absolute;right:24px;bottom:35px;font-size:92px;filter:drop-shadow(0 8px 0 #2b91a055);animation:float 2.5s ease-in-out infinite}.character:after{content:"";position:absolute;bottom:-11px;left:10px;width:78px;height:16px;background:#54b77c99;border-radius:50%;z-index:-1}@keyframes float{50%{transform:translateY(-8px) rotate(3deg)}}.sign{position:absolute;right:15px;bottom:27px;background:#e99c43;color:#fff;border:4px solid #fff;border-radius:10px;padding:8px 11px;font:17px Jua;transform:rotate(5deg);box-shadow:0 4px 0 #c6722d}.mission{margin:-3px 14px 0;background:#fff;border:4px solid #2d72a8;border-radius:20px;box-shadow:0 7px 0 #24638f;padding:13px 14px;position:relative;z-index:3}.mission-top{display:flex;justify-content:space-between;align-items:center}.mission b{font:20px Jua}.mission small{color:#8b9aac;font-size:10px}.meter{height:11px;background:#e9edf2;border-radius:99px;margin-top:10px;overflow:hidden}.meter i{display:block;height:100%;width:38%;background:linear-gradient(90deg,#ffb038,#ff6e5e);border-radius:99px;transition:.4s}.mission-go{border:0;background:#ff7c45;color:#fff;border-radius:12px;padding:10px 14px;font:15px Jua;box-shadow:0 4px 0 #cf5430;cursor:pointer}.section{padding:22px 18px}.section-head{display:flex;justify-content:space-between;align-items:end;margin-bottom:11px}.section-head h2{font:23px Jua;margin:2px 0}.section-head span{font-size:11px;color:#8a9cac}.path{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}.level{border:0;border-radius:17px;background:#fff;padding:10px 5px 11px;box-shadow:0 4px 0 #c9dde8;cursor:pointer;position:relative;color:var(--navy)}.level.done{background:#fff6cc}.level.current{background:#e1f8ff;outline:3px solid #23aee6}.level.locked{opacity:.6}.level-icon{width:47px;height:47px;border-radius:15px;margin:auto;display:grid;place-items:center;font:27px Jua;color:#fff}.l1{background:#ff8061}.l2{background:#f1bf42}.l3{background:#55c99c}.level b{display:block;font-size:11px;margin-top:7px}.level small{color:#95a0ab;font-size:9px}.check{position:absolute;right:5px;top:5px;color:#2cbe85}.play-zone{padding:18px;background:#edfaff;min-height:400px}.play-card{background:#fff;border:4px solid #267ebd;border-radius:23px;box-shadow:0 7px 0 #a9cde1;padding:19px 15px;text-align:center}.play-card .eyebrow{color:#e8753d;font-size:11px;font-weight:800;letter-spacing:1px}.play-card h2{font:27px Jua;margin:8px 0}.sound-letter{font:87px Jua;color:#1c85dc;line-height:1;margin:5px}.listen{border:0;border-radius:99px;padding:11px 17px;background:#e7f6ff;color:#107bd0;font-weight:800;cursor:pointer}.choices{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin-top:21px}.choice{border:0;border-radius:13px;background:#eaf0ff;color:#2e4c72;padding:15px 5px;font:26px Jua;box-shadow:0 4px 0 #c5d0e8;cursor:pointer}.choice:hover,.choice.good{background:#fff0aa;color:#e35d28;box-shadow:0 4px 0 #e2b83b}.choice.bad{animation:shake .25s}@keyframes shake{25%{transform:translateX(-4px)}75%{transform:translateX(4px)}}.feedback{min-height:26px;margin-top:14px;color:#ed6b3d;font-size:12px;font-weight:800}.reward{text-align:center;padding:15px}.reward .stars{font-size:42px;letter-spacing:5px;animation:pop .5s}@keyframes pop{50%{transform:scale(1.25)}}.again{border:0;background:#1788e8;color:#fff;border-radius:12px;padding:11px 20px;font:16px Jua;cursor:pointer}footer{text-align:center;color:#90a3ae;font-size:10px;padding:4px 0 22px}@media(min-width:700px){body{padding:30px 0}.game{border-radius:30px}}[hidden]{display:none!important}
-
-/* Mobile-first play controls: large targets and visible progress */
-@media(max-width:699px){
- body{background:#eaf8ff;overscroll-behavior-y:contain}
- .game{width:100%;max-width:600px;min-height:100dvh;box-shadow:none;padding-bottom:env(safe-area-inset-bottom)}
- .top{height:58px;padding:0 12px;position:sticky;top:0;z-index:10}
- .stage{min-height:285px;padding:16px 14px 22px}
- .quest h1{font-size:28px;max-width:70%}
- .character{right:12px;bottom:22px;font-size:75px}
- .mission{position:sticky;top:58px;z-index:8;margin:0 10px;border-width:3px;padding:10px 12px}
- .mission b{font-size:18px}
- .mission-go{min-height:48px;padding:10px 16px;font-size:16px;touch-action:manipulation}
- .section{padding:18px 12px}
- .section-head h2{font-size:24px}
- .path{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
- .level{min-height:105px;padding:12px 8px;touch-action:manipulation;-webkit-tap-highlight-color:transparent}
- .level-icon{width:48px;height:48px}
- .level b{font-size:14px}
- .level small{font-size:11px}
- .play-zone{padding:12px 10px 28px;min-height:60vh;scroll-margin-top:120px}
- .play-card{border-width:3px;padding:18px 13px}
- .play-card h2{font-size:28px}
- .sound-letter{font-size:clamp(88px,25vw,118px);margin:15px 0}
- .listen,.again{min-height:52px;padding:12px 20px;font-size:17px;touch-action:manipulation}
- .choices{gap:12px;margin-top:20px}
- .choice{min-height:72px;padding:14px 8px;font-size:30px;touch-action:manipulation;-webkit-tap-highlight-color:transparent}
- .feedback{font-size:15px;line-height:1.5;min-height:30px}
- canvas,button{touch-action:manipulation}
- footer{padding-bottom:calc(20px + env(safe-area-inset-bottom))}
-}
-
-/* RPG travel map and arrival animations */
-.travel-route{position:absolute;left:7%;right:21%;bottom:47px;height:7px;border-top:5px dotted #fff9;z-index:1}
-.travel-route i{position:absolute;top:-11px;width:16px;height:16px;border:3px solid #fff;background:#ffbe48;border-radius:50%;box-shadow:0 2px 0 #bc8c3d}
-.travel-route i:nth-child(1){left:0}.travel-route i:nth-child(2){left:50%}.travel-route i:nth-child(3){right:0}
-.character{right:auto;left:4%;z-index:2}
-.sign{z-index:3}
-.travel-status{position:absolute;left:14px;bottom:7px;z-index:3;padding:5px 10px;border-radius:99px;background:#fff9;color:#286546;font:13px Jua;box-shadow:0 2px 0 #276c4b33}
-.stage.traveling .character{animation:journey-hop 1.85s cubic-bezier(.2,.75,.25,1) forwards}
-.stage.arrived .character{transform:translateX(min(58vw,280px))}
-@keyframes journey-hop{
-  0%{transform:translateX(0) translateY(0) rotate(0)}
-  16%{transform:translateX(38px) translateY(-20px) rotate(-8deg)}
-  34%{transform:translateX(92px) translateY(0) rotate(7deg)}
-  53%{transform:translateX(150px) translateY(-23px) rotate(-7deg)}
-  74%{transform:translateX(210px) translateY(0) rotate(8deg)}
-  100%{transform:translateX(min(58vw,280px)) translateY(0) rotate(0)}
-}
-@media(max-width:699px){
- .travel-status{font-size:12px}
- .travel-route{right:19%;bottom:42px}
- .stage.traveling .character{animation-duration:1.85s}
-}
-@media(prefers-reduced-motion:reduce){.stage.traveling .character{animation-duration:.01ms;animation-iteration-count:1}}
-
-/* Friendly 3D-style RPG monster battle */
-.battle-arena{display:flex;align-items:center;gap:13px;margin:0 auto 14px;padding:9px 13px;min-height:112px;background:linear-gradient(135deg,#f3eaff,#e5f7ff);border:2px solid #c5e4f4;border-radius:20px;box-shadow:0 5px 0 #c4dcea;overflow:hidden}
-.enemy-stage{position:relative;display:grid;place-items:center;flex:0 0 96px;height:96px;perspective:420px}
-.enemy-shadow{position:absolute;bottom:7px;width:64px;height:14px;border-radius:50%;background:#304a6a26;filter:blur(2px)}
-.enemy3d{position:relative;z-index:1;display:grid;place-items:center;width:74px;height:74px;border:3px solid #ffffffc9;border-radius:44% 49% 42% 46%;background:radial-gradient(circle at 28% 22%,#fff 0 3%,var(--monster-light,#d9c4ff) 12%,var(--monster-color,#9a68e8) 48%,var(--monster-dark,#563d91) 100%);box-shadow:inset -12px -10px 0 #0002,inset 7px 6px 0 #fff5,0 8px 0 var(--monster-dark,#563d91),0 14px 17px #253a5429;transform:rotateY(-16deg) rotateX(9deg);transform-style:preserve-3d;animation:monsterFloat 2.4s ease-in-out infinite}
-.enemy3d span{font-size:42px;line-height:1;filter:drop-shadow(0 3px 1px #18283a44);transform:translateZ(13px)}
-@keyframes monsterFloat{50%{transform:rotateY(14deg) rotateX(-5deg) translateY(-5px)}}
-.enemy-info{flex:1;min-width:0;text-align:left}
-.enemy-title{display:flex;justify-content:space-between;align-items:center;gap:8px;font:16px Jua;color:#293a62}
-.enemy-title span{font:12px Jua;color:#6b7892;white-space:nowrap}
-.enemy-bar{height:13px;margin-top:7px;border:2px solid #fff;border-radius:99px;background:#d7dce8;overflow:hidden;box-shadow:0 2px 0 #bac6d8}
-.enemy-bar i{display:block;width:100%;height:100%;border-radius:99px;background:linear-gradient(90deg,#ff596f,#ff9c46);transition:width .35s ease}
-.battle-message{margin-top:7px;min-height:18px;font:12px Jua;color:#5f6685;line-height:1.35}
-.damage-pop{position:absolute;z-index:4;top:3px;right:0;opacity:0;font:20px Jua;color:#fa4f64;text-shadow:0 2px #fff}
-.damage-pop.show{animation:damagePop .65s ease-out forwards}
-@keyframes damagePop{0%{opacity:0;transform:translateY(10px) scale(.7)}25%{opacity:1;transform:translateY(-4px) scale(1.2)}100%{opacity:0;transform:translateY(-27px) scale(1)}}
-.enemy3d.hit{animation:monsterHit .42s ease-in-out}
-@keyframes monsterHit{0%,100%{transform:rotateY(-16deg) rotateX(9deg) translateX(0);filter:brightness(1)}25%{transform:rotateY(25deg) rotateX(-10deg) translateX(-9px) scale(.92);filter:brightness(1.8)}60%{transform:rotateY(-22deg) rotateX(8deg) translateX(8px) scale(1.06);filter:brightness(1.25)}}
-.enemy3d.defeated{animation:monsterDefeat .65s ease-in forwards}
-@keyframes monsterDefeat{40%{transform:rotateY(100deg) scale(.9);filter:grayscale(.6)}100%{transform:translateY(12px) rotateY(160deg) scale(.1);opacity:0}}
-@media(max-width:699px){.battle-arena{gap:9px;padding:8px 10px;min-height:105px}.enemy-stage{flex-basis:84px;height:86px}.enemy3d{width:66px;height:66px}.enemy3d span{font-size:38px}.enemy-title{font-size:15px}.battle-message{font-size:11px}}
-@media(prefers-reduced-motion:reduce){.enemy3d{animation:none}.enemy3d.hit,.enemy3d.defeated,.damage-pop.show{animation-duration:.01ms}}
-
-.sound-letter .food-art{display:block;width:clamp(104px,28vw,140px);height:auto;margin:2px auto;filter:drop-shadow(0 7px 5px #32445a28)}
-
-.damage-pop.recover{color:#18a875}
-.enemy3d.recover{animation:monsterRecover .55s ease-out}
-@keyframes monsterRecover{0%{transform:scale(.9);filter:brightness(1)}45%{transform:scale(1.13);filter:brightness(1.55);box-shadow:0 0 26px #42d99b,inset -12px -10px 0 #0002}100%{transform:scale(1);filter:brightness(1)}}
-</style><link rel="manifest" href="./manifest.webmanifest"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="소리한글"><link rel="apple-touch-icon" href="./icon.svg"></head><body><main class="game"><header class="top"><div class="avatar"><span class="avatar-face">🦊</span><span>지우의 모험</span></div><div class="stats"><span class="stat">❤️ 3</span><span class="stat">⭐ 128</span><span class="stat">Lv. 2</span></div></header><section class="stage" id="worldStage"><div class="cloud"></div><div class="cloud two"></div><div class="stage-content"><span class="quest-label" id="travelTag">🧭 소리섬 여행 · 1</span><div class="quest"><h1 id="worldTitle">소리섬에서 출발해요!</h1><p id="worldNote">글자 보물을 모아 다음 섬으로 떠나요.</p></div></div><div class="travel-route" aria-hidden="true"><i></i><i></i><i></i></div><div class="character" id="traveler">🦊</div><div class="sign" id="destination">소리섬</div><div class="travel-status" id="travelStatus" aria-live="polite">지도를 따라 모험을 떠나요!</div></section><section class="mission"><div class="mission-top"><div><small>오늘의 미션</small><b> 글자 보물 3개 찾기</b></div><button class="mission-go" id="start">시작!</button></div><div class="meter"><i id="meter"></i></div></section><section class="section"><div class="section-head"><div><span>ADVENTURE MAP</span><h2>한글 모험 지도</h2></div><span>1 / 3 스테이지</span></div><div class="path"><button class="level done" id="level1"><span class="level-icon l1">가</span><b>소리 동굴</b><small>완료 ✓</small><span class="check">●</span></button><button class="level current"><span class="level-icon l2">나</span><b>단어 숲</b><small>지금 도전!</small></button><button class="level locked"><span class="level-icon l3">다</span><b>문장 마을</b><small>🔒 잠김</small></button></div></section><section class="play-zone" id="playZone"><div class="battle-arena" id="battleArena"><div class="enemy-stage"><div class="enemy-shadow"></div><div class="enemy3d" id="enemy3d"><span id="enemyFace">👾</span></div><div class="damage-pop" id="damagePop" aria-hidden="true">💥 −1</div></div><div class="enemy-info"><div class="enemy-title"><b id="enemyName">글자 몬스터</b><span id="enemyHpText">5 / 5</span></div><div class="enemy-bar"><i id="enemyHp"></i></div><div class="battle-message" id="battleMessage" aria-live="polite">정답을 맞히면 몬스터가 데미지를 입어요!</div></div></div><div class="play-card"><span class="eyebrow">소리 보물찾기 · 1단계</span><h2>“가”의 첫소리를 골라요!</h2><div class="sound-letter">가</div><button class="listen" id="listen">🔊 소리 듣기</button><div class="choices"><button class="choice" data-a="ㄱ">ㄱ</button><button class="choice" data-a="ㄴ">ㄴ</button><button class="choice" data-a="ㅁ">ㅁ</button></div><div class="feedback" id="feedback">정답을 고르면 보물상자가 열려요!</div></div></section><footer>소리로 배우고, 모험으로 기억해요 ✨</footer></main><script src="./adventure.js?v=voice-fix-v3"></script><script src="./pwa-install.js"></script></body></html>
-
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta http-equiv="refresh" content="0; url=./rpg/">
+  <title>세계일주 한글 기차</title>
+</head>
+<body>
+  <p>세계일주 한글 기차를 열고 있어요. <a href="./rpg/">게임으로 이동하기</a></p>
+</body>
+</html>
