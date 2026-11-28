@@ -2,7 +2,7 @@
   const key='hangul-world-rpg-progress-v1';
   const note=document.querySelector('.note'); if(note)note.remove();
   const start=document.getElementById('start');
-  const home=document.createElement('button');home.className='secondary';home.textContent='🏠 메인 화면';home.hidden=true;
+  const home=document.createElement('button');home.className='secondary';home.textContent='🏠 홈';
   home.style.cssText='position:absolute;z-index:5;top:50px;left:12px;font-size:15px;padding:10px 14px;background:#fff3aa;color:#26354c;border:2px solid #bd872f;box-shadow:0 3px #bd872f';
   home.setAttribute('aria-label','진행을 저장하고 메인 화면으로');
   document.querySelector('.screen').appendChild(home);
@@ -24,7 +24,7 @@
     try {localStorage.setItem(key,JSON.stringify({version:1,journey,level,stars,energy,state,levels,completed:[...completedLevels]}));return true;}
     catch(_){$('feedback').textContent='이 기기에서 기록을 저장하지 못했어요. 브라우저 저장 공간을 확인해 주세요.';return false;}
   }
-  home.onclick=()=>{if(save())location.reload()};
+  home.onclick=()=>{if(!active||save())location.reload()};
   const oldSetState=setState;setState=function(s){oldSetState(s);queueMicrotask(save)};
   document.addEventListener('click',()=>queueMicrotask(save));
   const originalStart=start.onclick;
