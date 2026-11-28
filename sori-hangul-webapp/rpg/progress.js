@@ -3,8 +3,9 @@
   const note=document.querySelector('.note'); if(note)note.remove();
   const start=document.getElementById('start');
   const home=document.createElement('button');home.className='secondary';home.textContent='🏠 메인 화면';home.hidden=true;
-  home.style.cssText='font-size:14px;padding:8px 12px;margin:8px auto';
-  document.querySelector('.panel').prepend(home);
+  home.style.cssText='position:absolute;z-index:5;top:50px;left:12px;font-size:15px;padding:10px 14px;background:#fff3aa;color:#26354c;border:2px solid #bd872f;box-shadow:0 3px #bd872f';
+  home.setAttribute('aria-label','진행을 저장하고 메인 화면으로');
+  document.querySelector('.screen').appendChild(home);
   let stored=null;
   try { stored=JSON.parse(localStorage.getItem(key)||'null'); } catch (_) {}
   const valid=s=>s&&s.version===1&&Number.isInteger(s.journey)&&s.journey>=0&&Number.isInteger(s.level)&&s.level>=0&&s.level<8&&Number.isInteger(s.stars)&&s.stars>=0&&Number.isInteger(s.energy)&&s.energy>=0&&s.energy<=3&&Array.isArray(s.levels)&&s.levels.length===8&&s.levels.every(p=>p&&typeof p.question==='string'&&typeof p.answer==='string');
