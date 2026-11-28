@@ -12,6 +12,16 @@
     boxShadow:"0 4px 0 #c6532d, 0 6px 18px #18324c33", cursor:"pointer"
   });
   document.body.append(button);
+  const adventureLink = document.createElement("a");
+  adventureLink.href = "./rpg/";
+  adventureLink.textContent = "🚂 세계일주 RPG 체험하기";
+  Object.assign(adventureLink.style, {
+    display:"block", margin:"16px 0", padding:"14px", textAlign:"center",
+    background:"#4568d5", color:"#fff", borderRadius:"16px",
+    fontWeight:"800", textDecoration:"none"
+  });
+  const footer = document.querySelector("main footer");
+  if (footer) footer.before(adventureLink);
   const isInstalled = () => window.matchMedia("(display-mode: standalone)").matches || window.navigator.standalone === true;
   if (isInstalled()) button.hidden = true;
   window.addEventListener("beforeinstallprompt", event => {

@@ -1,4 +1,4 @@
-const CACHE_NAME = "sori-hangul-v3";
+const CACHE_NAME = "sori-hangul-v4";
 const CORE_FILES = ["./", "./index.html", "./adventure.js", "./pwa-install.js", "./manifest.webmanifest", "./icon.svg", "./audio/voice-map.js", "./audio/voice.mp3"];
 self.addEventListener("install", event => {
   event.waitUntil(caches.open(CACHE_NAME).then(cache => cache.addAll(CORE_FILES)).then(() => self.skipWaiting()));
@@ -9,6 +9,8 @@ self.addEventListener("activate", event => {
 self.addEventListener("fetch", event => {
   const request = event.request;
   if (request.method !== "GET" || new URL(request.url).origin !== self.location.origin) return;
+  // The RPG is a separate game; never store its navigation as the main app.
+  if (new URL(request.url).pathname.includes('/rpg/')) return;
   if (request.mode === "navigate") {
     event.respondWith(fetch(request).then(response => {
       const copy = response.clone();
