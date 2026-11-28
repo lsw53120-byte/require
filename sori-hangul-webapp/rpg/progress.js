@@ -2,6 +2,9 @@
   const key='hangul-world-rpg-progress-v1';
   const note=document.querySelector('.note'); if(note)note.remove();
   const start=document.getElementById('start');
+  const home=document.createElement('button');home.className='secondary';home.textContent='🏠 메인 화면';home.hidden=true;
+  home.style.cssText='font-size:14px;padding:8px 12px;margin:8px auto';
+  document.querySelector('.panel').prepend(home);
   let stored=null;
   try { stored=JSON.parse(localStorage.getItem(key)||'null'); } catch (_) {}
   const valid=s=>s&&s.version===1&&Number.isInteger(s.journey)&&s.journey>=0&&Number.isInteger(s.level)&&s.level>=0&&s.level<8&&Number.isInteger(s.stars)&&s.stars>=0&&Number.isInteger(s.energy)&&s.energy>=0&&s.energy<=3&&Array.isArray(s.levels)&&s.levels.length===8&&s.levels.every(p=>p&&typeof p.question==='string'&&typeof p.answer==='string');
@@ -10,14 +13,16 @@
   let active=false;
   function save(){
     if(!active||state==='ready')return;
-    try {localStorage.setItem(key,JSON.stringify({version:1,journey,level,stars,energy,state,levels,completed:[...completedLevels]}));}
-    catch(_){$('feedback').textContent='이 기기에서 기록을 저장하지 못했어요. 브라우저 저장 공간을 확인해 주세요.';}
+    try {localStorage.setItem(key,JSON.stringify({version:1,journey,level,stars,energy,state,levels,completed:[...completedLevels]}));return true;}
+    catch(_){$('feedback').textContent='이 기기에서 기록을 저장하지 못했어요. 브라우저 저장 공간을 확인해 주세요.';return false;}
   }
+  home.onclick=()=>{if(save())location.reload()};
   const oldSetState=setState;setState=function(s){oldSetState(s);queueMicrotask(save)};
   document.addEventListener('click',()=>queueMicrotask(save));
   const originalStart=start.onclick;
   start.onclick=()=>{
     active=true;
+    home.hidden=false;
     if(!stored){originalStart();return}
     const data=stored;stored=null;journey=data.journey;level=data.level;stars=data.stars;energy=data.energy;completedLevels=new Set(data.completed||[]);
     levels.splice(0,levels.length,...data.levels);worldChip.textContent='Lv.'+(journey+1)+' '+destinations[journey%destinations.length].landmark+' '+destinations[journey%destinations.length].country+' · 난이도 '+(Math.min(journey,4)+1);
